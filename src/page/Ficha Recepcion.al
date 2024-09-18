@@ -42,7 +42,7 @@ page 50100 "Recepción Mercancía"
                 }
                 field("VAT Registration No."; Rec."VAT Registration No.")
                 {
-                    ApplicationArea = VAT;
+                    ApplicationArea = All;
                     Editable = false;
                     Importance = Additional;
                     ToolTip = 'Specifies the customer''s VAT registration number for customers.';
@@ -154,7 +154,7 @@ page 50100 "Recepción Mercancía"
                 }
                 field("No."; Rec."No.") { ApplicationArea = All; }
                 field("Fecha Recepción Mercacía"; Rec."Order Date") { ApplicationArea = All; }
-                field("Location Code"; Rec."Location Code") { }
+                field("Location Code"; Rec."Location Code") { ApplicationArea = all; }
             }
             part(LineasRecepcion; "Subform Recepcion")
             {
@@ -170,17 +170,30 @@ page 50100 "Recepción Mercancía"
     {
         area(Processing)
         {
-            action("&Facturar")
+            action("&Facturar Tratamiento")
             {
                 ApplicationArea = All;
-                Caption = 'Tratar';
+                Caption = 'Facturar Tratamiento';
                 Promoted = true;
                 PromotedCategory = Process;
-                ToolTip = 'Facturar Recepcion';
+                ToolTip = 'Facturar Tratamiento';
                 Image = Invoice;
                 trigger OnAction()
                 begin
                     Facturar();
+                end;
+            }
+            action("&Facturar envio")
+            {
+                ApplicationArea = All;
+                Caption = 'Facturar Recepción';
+                Promoted = true;
+                PromotedCategory = Process;
+                ToolTip = 'Facturar Recepcion';
+                Image = "Invoicing-Save";
+                trigger OnAction()
+                begin
+                    FacturarRecepcion();
                 end;
             }
             action("&Recibir")
@@ -304,6 +317,8 @@ page 50100 "Recepción Mercancía"
         PurchHeader: Record "Purchase Header";
         PurchLine: Record "Purchase Line";
         ItemLedgShptEntryNo: Integer;
+        CantidadaTratar: Decimal;
+        CantidadaTratarBase: Decimal;
     begin
 
         PurchHeader.Get(Rec."Document Type", Rec."No.");
@@ -327,17 +342,19 @@ page 50100 "Recepción Mercancía"
 
                 ItemJnlLine.Quantity := -PurchLine."Cantidad a Tratar";
                 ItemJnlLine."Quantity (Base)" := -PurchLine."Cantidad a Tratar Base";
-
-                PurchLine.Validate("Cantidad Tratada", PurchLine."Cantidad Tratada" + PurchLine."Cantidad a Tratar");
+                CantidadaTratar := PurchLine."Cantidad a Tratar";
+                CantidadaTratarBase := PurchLine."Cantidad a Tratar Base";
+                PurchLine.Validate("Cantidad Tratada", PurchLine."Cantidad Tratada" + PurchLine."Cantidad a Tratar" + PurchLine."Cantidad a Merma");
                 PurchLine.Validate("Cantidad a Tratar", 0);
+                PurchLine.Validate("Cantidad a Merma", 0);
                 ItemJnlLine.Validate("Location Code", Rec."Location Code");
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 RunItemJnlPostLine(ItemJnlLine);
                 ItemJnlLine."Location Code" := Rec."Location Code" + 'T';
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt.";
-                ItemJnlLine.Quantity := -ItemJnlLine.Quantity;
-                ItemJnlLine."Quantity (Base)" := -ItemJnlLine."Quantity (Base)";
+                ItemJnlLine.Quantity := CantidadaTratar;
+                ItemJnlLine."Quantity (Base)" := CantidadaTratarBase;
                 RunItemJnlPostLine(ItemJnlLine);
                 PurchLine.Modify();
             until PurchLine.Next() = 0;
@@ -366,6 +383,8 @@ page 50100 "Recepción Mercancía"
         SalesHeader."Order Date" := PurchHeader."Order Date";
         SalesHeader.Validate("Order Date", Rec."Order Date");
         SalesHeader.Insert(true);
+        SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
+        SalesHeader.Modify(true);
         PurchLine.SetRange("Document Type", PurchHeader."Document Type");
         PurchLine.SetRange("Document No.", PurchHeader."No.");
         if PurchLine.FindSet() then
@@ -377,6 +396,7 @@ page 50100 "Recepción Mercancía"
                 iF PurchLine.Type = PurchLine.TYPE::Item then begin
                     SalesLine.Type := SalesLine.TYPE::"G/L Account";
                     ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                    ConfGrupos.TestField("Sales Account");
                     SalesLine."No." := ConfGrupos."Sales Account";
                 end else begin
                     SalesLine."Type" := PurchLine."Type";
@@ -388,6 +408,60 @@ page 50100 "Recepción Mercancía"
                 SalesLine."Quantity (Base)" := PurchLine."Cantidad a Tratar Base";
                 SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
                 SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+                SalesLine.Description := PurchLine.Description;
+                SalesLine.Insert(true);
+            until PurchLine.Next() = 0;
+
+    end;
+
+    local procedure FacturarRecepcion()
+    var
+        PurchLine: Record "Purchase Line";
+        PurchHeader: Record "Purchase Header";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        ConfGrupos: Record 252;
+    begin
+        SalesHeader.Init();
+        PurchHeader.Get(Rec."Document Type", Rec."No.");
+        SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+        SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
+        SalesHeader."Order Date" := PurchHeader."Order Date";
+        SalesHeader.Validate("Order Date", Rec."Order Date");
+        SalesHeader.Insert(true);
+        SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
+        SalesHeader.Modify(true);
+        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+        PurchLine.SetRange("Document No.", PurchHeader."No.");
+        PurchLine.SetFilter("Qty. Rcd. Not Invoiced", '<>%1', 0);
+        If not PurchLine.FindSet() then
+            Error('Compruebe si ha recibido la mercancía, y si no la ha facturado');
+        if PurchLine.FindSet() then
+            repeat
+                SalesLine.Init();
+                SalesLine."Document Type" := SalesHeader."Document Type";
+                SalesLine."Document No." := SalesHeader."No.";
+                SalesLine."Line No." := PurchLine."Line No.";
+                iF PurchLine.Type = PurchLine.TYPE::Item then begin
+                    SalesLine.Type := SalesLine.TYPE::"G/L Account";
+                    ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                    ConfGrupos.TestField("Sales Account");
+                    SalesLine."No." := ConfGrupos."Sales Account";
+                end else begin
+                    SalesLine."Type" := PurchLine."Type";
+                    SalesLine."No." := PurchLine."No.";
+                    SalesLine."Variant Code" := PurchLine."Variant Code";
+                end;
+
+                SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
+                PurchLine."Quantity Invoiced" += PurchLine."Qty. Rcd. Not Invoiced";
+                PurchLine."Qty. Rcd. Not Invoiced" := 0;
+                SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
+                PurchLine."Qty. Invoiced (Base)" += PurchLine."Qty. Rcd. Not Invoiced (Base)";
+                PurchLine."Qty. Rcd. Not Invoiced (Base)" := 0;
+                SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
+                SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+                SalesLine.Description := PurchLine.Description;
                 SalesLine.Insert(true);
             until PurchLine.Next() = 0;
 

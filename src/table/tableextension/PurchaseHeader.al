@@ -44,7 +44,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
 
             end;
         }
-        field(5015; "Bill-to Name"; Text[100])
+        field(50015; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
             TableRelation = Customer.Name;
@@ -71,23 +71,23 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
                 Validate("Bill-to Customer No.", Customer.GetCustNo("Bill-to Name"));
             end;
         }
-        field(5016; "Bill-to Name 2"; Text[50])
+        field(50016; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
         }
-        field(5017; "Bill-to Address"; Text[100])
+        field(50017; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
 
 
         }
-        field(5018; "Bill-to Address 2"; Text[50])
+        field(50018; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
 
 
         }
-        field(5019; "Bill-to City"; Text[30])
+        field(50019; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
             TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City

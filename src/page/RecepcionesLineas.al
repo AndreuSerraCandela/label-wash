@@ -1,13 +1,14 @@
 
-page 50144 "Subform Recepcion"
+page 50145 "Lineas Recepcion"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
     DelayedInsert = true;
     LinksAllowed = false;
     MultipleNewLines = true;
-    PageType = ListPart;
+    PageType = List;
     SourceTable = "Purchase Line";
+    SourceTableTemporary = true;
     SourceTableView = where("Document Type" = filter(Order), Type = filter(Item));
 
     layout
@@ -1519,6 +1520,23 @@ page 50144 "Subform Recepcion"
         OverReceiptAllowed := OverReceiptMgt.IsOverReceiptAllowed();
     end;
 
+    procedure CargaLineas(Lineas: Record "Purchase Line" temporary)
+    begin
+        if Lineas.FindSet() then
+            repeat
+                Rec := Lineas;
+                Rec.Insert();
+            until Lineas.Next() = 0;
+    end;
+
+    procedure DesCargaLineas(Lineas: Record "Purchase Line" temporary)
+    begin
+        if Rec.FindSet() then
+            repeat
+                Lineas := Rec;
+                Lineas.Insert();
+            until rec.Next() = 0;
+    end;
 
 }
 

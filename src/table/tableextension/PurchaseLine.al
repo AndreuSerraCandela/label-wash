@@ -15,6 +15,21 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         {
             DataClassification = CustomerContent;
         }
+        field(50105; "Cantidad a Merma"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                Validate("Cantidad a Tratar", Quantity - "Cantidad Tratada" - "Cantidad a Merma");
+                "Cantidad a Merma Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
+
+            end;
+
+        }
+        field(50106; "Cantidad a Merma Base"; Decimal)
+        {
+            DataClassification = CustomerContent;
+        }
 
         field(50102; "Cantidad Tratada"; Decimal)
         {
@@ -66,7 +81,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                         GetPriceCalculationHandler(PriceType::Sale, PurchaseHeader, PriceCalculation);
                         PriceCalculation.ApplyDiscount();
                         ApplyPrice(FieldNo(Quantity), PriceCalculation);
-
+                        Validate("Precio X Producto");
                     end;
                 end;
             end;
@@ -92,7 +107,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         If SalesHeader.Insert() Then;
         SalesLine."Document Type" := SalesHeader."Document Type";
         SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := rec."Line No.";
+        SalesLine."Line No." := Rec."Line No.";
         SalesLine."Type" := Rec.Type;
         SalesLine."No." := Rec."No.";
         SalesLine."Variant Code" := Rec."Variant Code";
@@ -124,7 +139,10 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         PriceCalculation.GetLine(Line);
         SalesLine := Line;
         Rec."Precio X Producto" := SalesLine."Unit Price";
-        SalesLine.Delete();
+        if SalesLine.Get(Rec."Document Type", Rec."Document No.", Rec."Line No.") then
+            SalesLine.Delete();
+
+
     end;
 
     procedure GetLineWithSalesPrice(var LineWithPrice: Interface "Line With Price")
