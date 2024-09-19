@@ -322,6 +322,12 @@ page 50144 "Subform Recepcion"
                     //     PAGE.RunModal(0, PurchInvLine);
                     // end;
                 }
+                field("Cantidad a Merma"; Rec."Cantidad a Merma")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
+                }
                 field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;

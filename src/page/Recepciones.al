@@ -290,6 +290,9 @@ page 50102 "Recepciones Mercancía"
         ItemLedgShptEntryNo: Integer;
         CantidadaTratar: Decimal;
         CantidadaTratarBase: Decimal;
+        ConfInv: Record "Inventory Posting Setup";
+        ConfInvT: Record "Inventory Posting Setup";
+
     begin
 
         PurchHeader.Get(Rec."Document Type", Rec."No.");
@@ -298,6 +301,13 @@ page 50102 "Recepciones Mercancía"
             location."Code" := Rec."Location Code" + 'T';
             location."Name" := Rec."Location Code" + 'T';
             location.Insert();
+            ConfInv.SetRange("Location Code", Rec."Location Code");
+            if ConfInv.FindSet() then
+                repeat
+                    ConfInvT := ConfInv;
+                    ConfInvT."Location Code" := Rec."Location Code" + 'T';
+                    If ConfInvT.Insert() Then;
+                until ConfInv.Next() = 0;
         end;
 
         if PurchLineTemp.FindFirst() then
@@ -307,8 +317,9 @@ page 50102 "Recepciones Mercancía"
                 ItemJnlLine.CopyFromPurchHeader(PurchHeader);
                 ItemJnlLine.CopyFromPurchLine(PurchLineTemp);
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
-                ItemJnlLine."Item Shpt. Entry No." := ItemLedgShptEntryNo;
-
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine."Document No." := PurchHeader."No.";
+                ItemJnlLine."Posting Date" := Today;
                 ItemJnlLine.Quantity := -PurchLineTemp."Cantidad a Tratar";
                 ItemJnlLine."Quantity (Base)" := -PurchLineTemp."Cantidad a Tratar Base";
                 CantidadaTratar := PurchLineTemp."Cantidad a Tratar";
@@ -323,6 +334,7 @@ page 50102 "Recepciones Mercancía"
                 ItemJnlLine."Location Code" := Rec."Location Code" + 'T';
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt.";
                 ItemJnlLine.Quantity := CantidadaTratar;
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
                 ItemJnlLine."Quantity (Base)" := CantidadaTratarBase;
                 RunItemJnlPostLine(ItemJnlLine);
             //PurchLine.Modify();
