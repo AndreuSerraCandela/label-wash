@@ -209,13 +209,26 @@ page 50100 "Recepción Mercancía"
                     Recibir(CODEUNIT::"Purch.-Post (Yes/No)", Enum::"Navigate After Posting"::"New Document");
                 end;
             }
+            action(Usar)
+            {
+                ApplicationArea = All;
+                Caption = 'Usar';
+                Promoted = true;
+                PromotedCategory = Process;
+                ToolTip = 'Usar';
+                Image = Share;
+                trigger OnAction()
+                begin
+                    Usa();
+                end;
+            }
             action(Tratar)
             {
                 ApplicationArea = All;
                 Caption = 'Tratar';
                 Promoted = true;
                 PromotedCategory = Process;
-                ToolTip = 'Anular';
+                ToolTip = 'Tratar';
                 Image = Share;
                 trigger OnAction()
                 begin
@@ -322,6 +335,8 @@ page 50100 "Recepción Mercancía"
         ConfInv: Record "inventory posting setup";
         ConfInvT: Record "inventory posting setup";
         ConfInvM: Record "inventory posting setup";
+        Merma: Decimal;
+        MermaBase: Decimal;
     begin
 
         PurchHeader.Get(Rec."Document Type", Rec."No.");
@@ -338,7 +353,20 @@ page 50100 "Recepción Mercancía"
                     If ConfInvT.Insert() Then;
                 until ConfInv.Next() = 0;
         end;
-
+        // lo mismo para 'M'
+        If Not Location.Get(Rec."Location Code" + 'M') Then begin
+            location.Init();
+            location."Code" := Rec."Location Code" + 'M';
+            location."Name" := Rec."Location Code" + 'M';
+            location.Insert();
+            ConfInv.SetRange("Location Code", Rec."Location Code");
+            if ConfInv.FindSet() then
+                repeat
+                    ConfInvM := ConfInv;
+                    ConfInvM."Location Code" := Rec."Location Code" + 'M';
+                    If ConfInvM.Insert() Then;
+                until ConfInv.Next() = 0;
+        end;
         PurchLine.SetRange("Document Type", PurchHeader."Document Type");
         PurchLine.SetRange("Document No.", PurchHeader."No.");
         if PurchLine.FindFirst() then
@@ -355,6 +383,8 @@ page 50100 "Recepción Mercancía"
                 ItemJnlLine."Quantity (Base)" := -PurchLine."Cantidad a Tratar Base";
                 CantidadaTratar := PurchLine."Cantidad a Tratar";
                 CantidadaTratarBase := PurchLine."Cantidad a Tratar Base";
+                Merma := PurchLine."Cantidad a Merma";
+                MermaBase := PurchLine."Cantidad a Merma Base";
                 PurchLine.Validate("Cantidad Tratada", PurchLine."Cantidad Tratada" + PurchLine."Cantidad a Tratar" + PurchLine."Cantidad a Merma");
                 PurchLine.Validate("Cantidad a Tratar", 0);
                 PurchLine.Validate("Cantidad a Merma", 0);
@@ -368,12 +398,92 @@ page 50100 "Recepción Mercancía"
                 ItemJnlLine.Quantity := CantidadaTratar;
                 ItemJnlLine."Quantity (Base)" := CantidadaTratarBase;
                 RunItemJnlPostLine(ItemJnlLine);
+                ItemJnlLine."Location Code" := Rec."Location Code" + 'M';
+                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt.";
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine.Quantity := Merma;
+                ItemJnlLine."Quantity (Base)" := MermaBase;
+                RunItemJnlPostLine(ItemJnlLine);
                 PurchLine.Modify();
             until PurchLine.Next() = 0;
 
 
 
     end;
+
+    local procedure Usa()
+    var
+        location: Record Location;
+        ItemJnlLine: Record "Item Journal Line";
+        OriginalItemJnlLine: Record "Item Journal Line";
+        TempWhseJnlLine: Record "Warehouse Journal Line" temporary;
+        TempWhseTrackingSpecification: Record "Tracking Specification" temporary;
+        TempTrackingSpecificationChargeAssmt: Record "Tracking Specification" temporary;
+        TempReservationEntry: Record "Reservation Entry" temporary;
+        PostWhseJnlLine: Boolean;
+        CheckApplToItemEntry: Boolean;
+        PostJobConsumptionBeforePurch: Boolean;
+        IsHandled: Boolean;
+        PurchHeader: Record "Purchase Header";
+        PurchLine: Record "Purchase Line";
+        ItemLedgShptEntryNo: Integer;
+        CantidadaUsar: Decimal;
+        CantidadaUsarBase: Decimal;
+        ConfInv: Record "inventory posting setup";
+        ConfInvT: Record "inventory posting setup";
+        ConfInvM: Record "inventory posting setup";
+    begin
+
+        PurchHeader.Get(Rec."Document Type", Rec."No.");
+        If Not Location.Get(Rec."Location Code" + 'U') Then begin
+            location.Init();
+            location."Code" := Rec."Location Code" + 'U';
+            location."Name" := Rec."Location Code" + 'U';
+            location.Insert();
+            ConfInv.SetRange("Location Code", Rec."Location Code");
+            if ConfInv.FindSet() then
+                repeat
+                    ConfInvT := ConfInv;
+                    ConfInvT."Location Code" := Rec."Location Code" + 'U';
+                    If ConfInvT.Insert() Then;
+                until ConfInv.Next() = 0;
+        end;
+
+        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+        PurchLine.SetRange("Document No.", PurchHeader."No.");
+        if PurchLine.FindFirst() then
+            repeat
+
+                ItemJnlLine.Init();
+                ItemJnlLine.CopyFromPurchHeader(PurchHeader);
+                ItemJnlLine.CopyFromPurchLine(PurchLine);
+                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine."Document No." := PurchHeader."No.";
+                ItemJnlLine."Posting Date" := Today;
+                ItemJnlLine.Quantity := -PurchLine."Cantidad a Uso";
+                ItemJnlLine."Quantity (Base)" := -PurchLine."Cantidad a Uso Base";
+                CantidadaUsar := PurchLine."Cantidad a Tratar";
+                CantidadausarBase := PurchLine."Cantidad a Tratar Base";
+                PurchLine.Validate("Cantidad Usada", PurchLine."Cantidad usada" + PurchLine."Cantidad a Uso");
+                PurchLine.Validate("Cantidad a Uso", PurchLine."Qty. Rcd. Not Invoiced" - PurchLine."Cantidad Usada");
+                ItemJnlLine.Validate("Location Code", Rec."Location Code");
+                ItemJnlLine."Invoiced Quantity" := 0;
+                ItemJnlLine."Invoiced Qty. (Base)" := 0;
+                RunItemJnlPostLine(ItemJnlLine);
+                ItemJnlLine."Location Code" := Rec."Location Code" + 'U';
+                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt.";
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine.Quantity := CantidadaUsar;
+                ItemJnlLine."Quantity (Base)" := CantidadaUsarBase;
+                RunItemJnlPostLine(ItemJnlLine);
+                PurchLine.Modify();
+            until PurchLine.Next() = 0;
+
+
+
+    end;
+
 
     local procedure RunItemJnlPostLine(var ItemJnlLineToPost: Record "Item Journal Line")
     begin

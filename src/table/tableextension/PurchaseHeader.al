@@ -2,6 +2,15 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
 {
     fields
     {
+        modify("No.")
+        {
+            trigger OnAfterValidate()
+            begin
+                if Recepcion then begin
+                    Validate("Location Code", "Bill-to Customer No.");
+                end;
+            end;
+        }
         field(50000; Recepcion; Boolean) { }
         field(50104; "Bill-to Customer No."; Code[20])
         {

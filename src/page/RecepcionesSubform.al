@@ -216,6 +216,20 @@ page 50144 "Subform Recepcion"
                         DeltaUpdateTotals();
                     end;
                 }
+                field("Precio Tratamiento"; Rec."Precio Tratamiento")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
+                    ToolTip = 'Specifies the price of one unit of what you''re buying.';
+
+                    // trigger OnValidate()
+                    // begin
+                    //     DeltaUpdateTotals();
+                    // end;
+                }
                 field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = Suite;
@@ -293,6 +307,18 @@ page 50144 "Subform Recepcion"
                         PurchRcptLine.SetFilter(Quantity, '<>%1', 0);
                         PAGE.RunModal(0, PurchRcptLine);
                     end;
+                }
+                field("Cantidad a Uso"; Rec."Cantidad a Uso")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
+                }
+                field("Cantidad Usada"; Rec."Cantidad Usada")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
                 }
                 field("Cantidad a tratar"; Rec."Cantidad a Tratar")
                 {

@@ -11,6 +11,19 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             end;
 
         }
+        field(50108; "Cantidad a uso Base"; Decimal)
+        {
+            DataClassification = CustomerContent;
+        }
+        field(50109; "Cantidad a Uso"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                "Cantidad a uso Base" := CalcBaseQty("Cantidad a Uso", FieldCaption("Cantidad a Uso"), FieldCaption("Cantidad a Uso Base"));
+            end;
+
+        }
         field(50101; "Cantidad a Tratar Base"; Decimal)
         {
             DataClassification = CustomerContent;
@@ -39,6 +52,18 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 "Cantidad Tratada Base" := CalcBaseQty("Cantidad Tratada", FieldCaption("Cantidad Tratada"), FieldCaption("Cantidad Tratada Base"));
             end;
         }
+        field(50110; "Cantidad Usada Base"; Decimal)
+        {
+            DataClassification = CustomerContent;
+        }
+        field(50111; "Cantidad Usada"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                "Cantidad Usada Base" := CalcBaseQty("Cantidad Usada", FieldCaption("Cantidad Usada"), FieldCaption("Cantidad Usada Base"));
+            end;
+        }
         field(50103; "Cantidad Tratada Base"; Decimal)
         {
             DataClassification = CustomerContent;
@@ -52,6 +77,11 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
 
             end;
         }
+        field(50107; "Precio Tratamiento"; DECIMAL)
+        {
+            DataClassification = CustomerContent;
+
+        }
         modify("Qty. to Receive")
         {
             trigger OnAfterValidate()
@@ -62,6 +92,8 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                     if PurchaseHeader.Recepcion Then begin
                         "Cantidad a Tratar" := "Qty. to Receive";
                         "Cantidad a Tratar Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a Tratar Base"));
+                        "Cantidad a Uso" := "Qty. to Receive";
+                        "Cantidad a Uso Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a Uso Base"));
                         GetPriceCalculationHandler(PriceType::Sale, PurchaseHeader, PriceCalculation);
                         PriceCalculation.ApplyDiscount();
                         ApplyPrice(FieldNo(Quantity), PriceCalculation);
@@ -139,6 +171,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         PriceCalculation.GetLine(Line);
         SalesLine := Line;
         Rec."Precio X Producto" := SalesLine."Unit Price";
+        Rec."Precio Tratamiento" := salesline."Unit Volume";
         if SalesLine.Get(Rec."Document Type", Rec."Document No.", Rec."Line No.") then
             SalesLine.Delete();
 

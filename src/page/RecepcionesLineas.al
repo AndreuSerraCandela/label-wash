@@ -295,6 +295,18 @@ page 50145 "Lineas Recepcion"
                         PAGE.RunModal(0, PurchRcptLine);
                     end;
                 }
+                field("Cantidad a Uso"; Rec."Cantidad a Uso")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
+                }
+                field("Cantidad Usada"; Rec."Cantidad Usada")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+                }
                 field("Cantidad a tratar"; Rec."Cantidad a Tratar")
                 {
                     ApplicationArea = Suite;
