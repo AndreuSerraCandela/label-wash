@@ -6,7 +6,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
         {
             trigger OnAfterValidate()
             begin
-                if Recepcion = Recepcion::Entrega then begin
+                if Recepcion = Recepcion::"Recepción" then begin
                     Validate("Location Code", "Bill-to Customer No.");
                 end;
                 if Recepcion = Recepcion::Tratamiento then begin
@@ -22,7 +22,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
             trigger OnAfterValidate()
             begin
                 if "Location Code" <> '' Then exit;
-                if Recepcion = Recepcion::Entrega then begin
+                if Recepcion = Recepcion::"Recepción" then begin
                     Validate("Location Code", "Bill-to Customer No.");
                 end;
                 if Recepcion = Recepcion::Tratamiento then begin
@@ -56,7 +56,6 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
 
                 Validate("Buy-from Vendor No.", PurchSetup."Proveedor Tratamientos");
                 validate("no. series", purchsetup."Recepcion Tratamientos");
-                validate("posting no. series", purchsetup."Recepciones Tratamientos");
                 validate("Receiving No. Series", purchsetup."Recepciones Tratamientos");
                 If Cust."Location Code" <> '' then Validate("Location Code", Cust."Location Code");
                 if Cust."Location Code" = '' then begin

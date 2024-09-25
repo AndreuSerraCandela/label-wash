@@ -1,7 +1,8 @@
-page 50102 "Recepciones Mercancía"
+page 50102 "Mercancía Clientes"
 {
     PageType = list;
     SourceTable = "Purchase Header";
+    CardPageId = "Recepción Mercancía";
     UsageCategory = Lists;
     ModifyAllowed = false;
     ApplicationArea = All;
@@ -167,101 +168,11 @@ page 50102 "Recepciones Mercancía"
                 ApplicationArea = All;
                 Caption = 'Recepcion mercancia Nueva';
                 Image = Recalculate;
-                trigger OnAction()
-                var
+                RunObject = Page "Recepción Mercancía";
+                RunPageMode = Create;
 
-                    ItemJnlLine: Record "Item Journal Line";
-                    PurchHeader: Record "Purchase Header";
-                    Linea: Integer;
-                    PageLineas: Page "Lineas Recepcion";
-                    PruchSetup: Record "Purchases & Payables Setup";
-                    Location: Record Location;
-                    ConfInv: Record "Inventory Posting Setup";
-                    ConfInvT: Record "Inventory Posting Setup";
-                    PurchLine: Record "Purchase Line";
-                begin
-                    PruchSetup.Get();
-                    PurchHeader.Init();
-                    PurchHeader."Document Type" := PurchHeader."Document Type"::Order;
-                    PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
-                    PurchHeader."Order Date" := Rec."Order Date";
-                    PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
-                    PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
-                    PurchHeader."No." := '';
-                    PurchHeader.Recepcion := Recepcion::Recepción;
-                    Page.RunModal(pAGE::"Tratamiento Mercancía", PurchHeader);
-
-                end;
             }
-            action("Recepcion para tratar")
-            {
-                ApplicationArea = All;
-                Caption = 'Recepcion para tratar';
-                Image = Recalculate;
-                trigger OnAction()
-                var
 
-                    ItemJnlLine: Record "Item Journal Line";
-                    PurchHeader: Record "Purchase Header";
-                    Linea: Integer;
-                    PageLineas: Page "Lineas Recepcion";
-                    PruchSetup: Record "Purchases & Payables Setup";
-                    Location: Record Location;
-                    ConfInv: Record "Inventory Posting Setup";
-                    ConfInvT: Record "Inventory Posting Setup";
-                    PurchLine: Record "Purchase Line";
-                begin
-                    PruchSetup.Get();
-
-                    ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No." + 'U');
-                    If ItemJnlLine.FindSet() then begin
-                        PurchHeader := Rec;
-                        PurchHeader.Recepcion := Recepcion::Tratamiento;
-                        PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
-                        PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
-                        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
-                        PurchHeader."No." := '';
-                        PurchHeader.Insert(true);
-                        PurchHeader."Location Code" := Rec."Location Code" + 'T';
-                        If Not Location.Get(Rec."Location Code" + 'T') Then begin
-                            location.Init();
-                            location."Code" := Rec."Location Code" + 'T';
-                            location."Name" := Rec."Location Code" + 'T';
-                            location.Insert();
-                            ConfInv.SetRange("Location Code", Rec."Location Code");
-                            if ConfInv.FindSet() then
-                                repeat
-                                    ConfInvT := ConfInv;
-                                    ConfInvT."Location Code" := Rec."Location Code" + 'T';
-                                    If ConfInvT.Insert() Then;
-                                until ConfInv.Next() = 0;
-                        end;
-                    end;
-                    repeat
-
-                        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
-                        PurchLine.SetRange("Document No.", PurchHeader."No.");
-                        PurchLine.SetRange("No.", ItemJnlLine."Item No.");
-                        if PurchLine.FindFirst() then begin
-                            PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
-                            PurchLine.Modify();
-                        end else begin
-                            PurchLine.Init();
-                            PurchLine."Document Type" := PurchHeader."Document Type";
-                            PurchLine."Document No." := PurchHeader."No.";
-                            Linea += 10000;
-                            PurchLine."Line No." := Linea;
-                            PurchLine."Type" := PurchLine.Type::Item;
-                            PurchLine."No." := ItemJnlLine."Item No.";
-                            PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
-                            PurchLine.Insert();
-                        end;
-                    until ItemJnlLine.Next() = 0;
-                    Commit();
-                    Page.RunModal(pAGE::"Tratamiento Mercancía", PurchHeader);
-
-                end;
-            }
             action("Envio Para uso desde Cliente")
             {
                 ApplicationArea = All;
@@ -270,7 +181,7 @@ page 50102 "Recepciones Mercancía"
                 trigger OnAction()
                 var
 
-                    ItemJnlLine: Record "Item Journal Line";
+                    ItemJnlLine: Record "Item Ledger Entry";
                     PurchHeader: Record "Purchase Header";
                     Linea: Integer;
                     PageLineas: Page "Lineas Recepcion";
@@ -284,14 +195,15 @@ page 50102 "Recepciones Mercancía"
 
                     ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No.");
                     If ItemJnlLine.FindSet() then begin
-                        PurchHeader := Rec;
+                        InitPurch(PurchHeader, Rec);
                         PurchHeader.Recepcion := Recepcion::Uso;
                         PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
                         PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
                         PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
+                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
                         PurchHeader."No." := '';
                         PurchHeader.Insert(true);
-                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
+
                         If Not Location.Get(Rec."Location Code" + 'U') Then begin
                             location.Init();
                             location."Code" := Rec."Location Code" + 'U';
@@ -305,29 +217,104 @@ page 50102 "Recepciones Mercancía"
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
-                    end;
-                    repeat
+                        repeat
 
-                        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
-                        PurchLine.SetRange("Document No.", PurchHeader."No.");
-                        PurchLine.SetRange("No.", ItemJnlLine."Item No.");
-                        if PurchLine.FindFirst() then begin
-                            PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
-                            PurchLine.Modify();
-                        end else begin
-                            PurchLine.Init();
-                            PurchLine."Document Type" := PurchHeader."Document Type";
-                            PurchLine."Document No." := PurchHeader."No.";
-                            Linea += 10000;
-                            PurchLine."Line No." := Linea;
-                            PurchLine."Type" := PurchLine.Type::Item;
-                            PurchLine."No." := ItemJnlLine."Item No.";
-                            PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
-                            PurchLine.Insert();
-                        end;
-                    until ItemJnlLine.Next() = 0;
+                            PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+                            PurchLine.SetRange("Document No.", PurchHeader."No.");
+                            PurchLine.SetRange("No.", ItemJnlLine."Item No.");
+                            if PurchLine.FindFirst() then begin
+                                PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+                            end else begin
+                                PurchLine.Init();
+                                PurchLine."Document Type" := PurchHeader."Document Type";
+                                PurchLine."Document No." := PurchHeader."No.";
+                                Linea += 10000;
+                                PurchLine."Line No." := Linea;
+                                PurchLine."Type" := PurchLine.Type::Item;
+
+                                PurchLine.Insert(true);
+                                PurchLine.Validate("No.", ItemJnlLine."Item No.");
+                                PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+                            end;
+                        until ItemJnlLine.Next() = 0;
+                    end;
                     Commit();
-                    Page.RunModal(pAGE::"Uso Mercancía", PurchHeader);
+                    Page.Run(pAGE::"Uso Mercancía", PurchHeader);
+
+                end;
+            }
+            action("Recepcion para tratar")
+            {
+                ApplicationArea = All;
+                Caption = 'Recepcion para tratar';
+                Image = Recalculate;
+                trigger OnAction()
+                var
+
+                    ItemJnlLine: Record "Item Ledger Entry";
+                    PurchHeader: Record "Purchase Header";
+                    Linea: Integer;
+                    PageLineas: Page "Lineas Recepcion";
+                    PruchSetup: Record "Purchases & Payables Setup";
+                    Location: Record Location;
+                    ConfInv: Record "Inventory Posting Setup";
+                    ConfInvT: Record "Inventory Posting Setup";
+                    PurchLine: Record "Purchase Line";
+                begin
+                    PruchSetup.Get();
+
+                    ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No." + 'U');
+                    If ItemJnlLine.FindSet() then begin
+                        InitPurch(PurchHeader, Rec);
+                        PurchHeader.Recepcion := Recepcion::Tratamiento;
+                        PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
+                        PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
+                        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
+                        PurchHeader."Location Code" := Rec."Location Code" + 'T';
+                        PurchHeader."No." := '';
+                        PurchHeader.Insert(true);
+
+                        If Not Location.Get(Rec."Location Code" + 'T') Then begin
+                            location.Init();
+                            location."Code" := Rec."Location Code" + 'T';
+                            location."Name" := Rec."Location Code" + 'T';
+                            location.Insert();
+                            ConfInv.SetRange("Location Code", Rec."Location Code");
+                            if ConfInv.FindSet() then
+                                repeat
+                                    ConfInvT := ConfInv;
+                                    ConfInvT."Location Code" := Rec."Location Code" + 'T';
+                                    If ConfInvT.Insert() Then;
+                                until ConfInv.Next() = 0;
+                        end;
+                        repeat
+
+                            PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+                            PurchLine.SetRange("Document No.", PurchHeader."No.");
+                            PurchLine.SetRange("No.", ItemJnlLine."Item No.");
+                            if PurchLine.FindFirst() then begin
+                                PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+                            end else begin
+                                PurchLine.Init();
+                                PurchLine."Document Type" := PurchHeader."Document Type";
+                                PurchLine."Document No." := PurchHeader."No.";
+                                Linea += 10000;
+                                PurchLine."Line No." := Linea;
+                                PurchLine."Type" := PurchLine.Type::Item;
+
+                                PurchLine.Insert(true);
+                                PurchLine.Validate("No.", ItemJnlLine."Item No.");
+                                PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+
+                            end;
+                        until ItemJnlLine.Next() = 0;
+                    end;
+                    Commit();
+                    Page.Run(pAGE::"Tratamiento Mercancía", PurchHeader);
 
                 end;
             }
@@ -339,7 +326,7 @@ page 50102 "Recepciones Mercancía"
                 trigger OnAction()
                 var
 
-                    ItemJnlLine: Record "Item Journal Line";
+                    ItemJnlLine: Record "Item Ledger Entry";
                     PurchHeader: Record "Purchase Header";
                     Linea: Integer;
                     PageLineas: Page "Lineas Recepcion";
@@ -353,14 +340,15 @@ page 50102 "Recepciones Mercancía"
 
                     ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No." + 'T');
                     If ItemJnlLine.FindSet() then begin
-                        PurchHeader := Rec;
+                        InitPurch(PurchHeader, Rec);
                         PurchHeader.Recepcion := Recepcion::Uso;
                         PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
                         PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
                         PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
+                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
                         PurchHeader."No." := '';
                         PurchHeader.Insert(true);
-                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
+
                         If Not Location.Get(Rec."Location Code" + 'U') Then begin
                             location.Init();
                             location."Code" := Rec."Location Code" + 'U';
@@ -374,29 +362,32 @@ page 50102 "Recepciones Mercancía"
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
-                    end;
-                    repeat
+                        repeat
 
-                        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
-                        PurchLine.SetRange("Document No.", PurchHeader."No.");
-                        PurchLine.SetRange("No.", ItemJnlLine."Item No.");
-                        if PurchLine.FindFirst() then begin
-                            PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
-                            PurchLine.Modify();
-                        end else begin
-                            PurchLine.Init();
-                            PurchLine."Document Type" := PurchHeader."Document Type";
-                            PurchLine."Document No." := PurchHeader."No.";
-                            Linea += 10000;
-                            PurchLine."Line No." := Linea;
-                            PurchLine."Type" := PurchLine.Type::Item;
-                            PurchLine."No." := ItemJnlLine."Item No.";
-                            PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
-                            PurchLine.Insert();
-                        end;
-                    until ItemJnlLine.Next() = 0;
+                            PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+                            PurchLine.SetRange("Document No.", PurchHeader."No.");
+                            PurchLine.SetRange("No.", ItemJnlLine."Item No.");
+                            if PurchLine.FindFirst() then begin
+                                PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+                            end else begin
+                                PurchLine.Init();
+                                PurchLine."Document Type" := PurchHeader."Document Type";
+                                PurchLine."Document No." := PurchHeader."No.";
+                                Linea += 10000;
+                                PurchLine."Line No." := Linea;
+                                PurchLine."Type" := PurchLine.Type::Item;
+
+                                PurchLine.Insert(true);
+                                PurchLine.Validate("No.", ItemJnlLine."Item No.");
+                                PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
+                                PurchLine.Modify();
+
+                            end;
+                        until ItemJnlLine.Next() = 0;
+                    end;
                     Commit();
-                    Page.RunModal(pAGE::"Uso Mercancía", PurchHeader);
+                    Page.Run(pAGE::"Uso Mercancía", PurchHeader);
 
                 end;
             }
@@ -467,5 +458,29 @@ page 50102 "Recepciones Mercancía"
     local procedure RunItemJnlPostLine(var ItemJnlLineToPost: Record "Item Journal Line")
     begin
         ItemJnlPostLine.RunWithCheck(ItemJnlLineToPost);
+    end;
+
+    local procedure InitPurch(var PurchHeader: Record "Purchase Header"; Rec: Record "Purchase Header")
+    begin
+        PurchHeader.InitFromPurchHeader(Rec);
+        PurchHeader."Document Type" := Rec."Document Type";
+        PurchHeader."No. Series" := Rec."No. Series";
+        PurchHeader."Receiving No. Series" := Rec."Receiving No. Series";
+        PurchHeader."Buy-from Vendor No." := Rec."Buy-from Vendor No.";
+        PurchHeader."Pay-to Vendor No." := Rec."Buy-from Vendor No.";
+        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
+        PurchHeader."Bill-to Address" := Rec."Bill-to Address";
+        PurchHeader."Bill-to Address 2" := Rec."Bill-to Address 2";
+        PurchHeader."Bill-to City" := Rec."Bill-to City";
+        PurchHeader."Bill-to County" := Rec."Bill-to County";
+        PurchHeader."Bill-to Post Code" := Rec."Bill-to Post Code";
+        PurchHeader."Bill-to Country/Region Code" := Rec."Bill-to Country/Region Code";
+        PurchHeader."Bill-to Contact No." := Rec."Bill-to Contact No.";
+        PurchHeader."Bill-to Phone No." := Rec."Bill-to Phone No.";
+        PurchHeader."Bill-to E-Mail" := Rec."Bill-to E-Mail";
+        PurchHeader."Bill-to Name" := Rec."Bill-to Name";
+        PurchHeader."VAT Registration No." := Rec."VAT Registration No.";
+        PurchHeader."Bill-to Name 2" := Rec."Bill-to Name 2";
+
     end;
 }

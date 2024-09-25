@@ -352,6 +352,11 @@ page 50103 "Uso Mercancía"
 
     end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        Rec.Recepcion := Recepcion::Uso;
+    end;
+
     var
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         OpenPostedPurchaseOrderQst: Label 'El Recibo se ha registrado con el numero %1 y. se ha movidoa la ventana de albaranes, quiere verlo?', Comment = '%1 = posted document number';

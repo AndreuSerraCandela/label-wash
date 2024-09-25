@@ -3,7 +3,7 @@ codeunit 50100 EventosTratamientos
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post (Yes/No)", 'OnBeforeConfirmPost', '', false, false)]
     local procedure OnBeforeConfirmPost(var PurchaseHeader: Record "Purchase Header"; var HideDialog: Boolean; var IsHandled: Boolean; var DefaultOption: Integer)
     begin
-        if PurchaseHeader.Recepcion Then begin
+        if PurchaseHeader.Recepcion <> Recepcion::" " Then begin
             PurchaseHeader.Receive := true;
             PurchaseHeader.Invoice := false;
             HideDialog := true;
@@ -23,6 +23,54 @@ codeunit 50100 EventosTratamientos
     begin
         if TempSalesPrice."Precio de Tartamiento" <> 0 Then
             SalesLine."Unit Volume" := TempSalesPrice."Precio de Tartamiento";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterUpdatePurchLineBeforePost', '', false, false)]
+    local procedure OnAfterUpdatePurchLineBeforePost(var PurchaseLine: Record "Purchase Line"; WhseShip: Boolean; WhseReceive: Boolean; PurchaseHeader: Record "Purchase Header"; RoundingLineInserted: Boolean)
+    begin
+        if PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
+            PurchaseLine."Qty. Rcd. Not Invoiced" := PurchaseLine."Qty. Rcd. Not Invoiced" + PurchaseLine."Cantidad a Merma";
+            PurchaseLine."Qty. Rcd. Not Invoiced (Base)" := PurchaseLine."Qty. Rcd. Not Invoiced (Base)" + PurchaseLine."Cantidad a Merma Base";
+            PurchaseLine."Quantity Received" := PurchaseLine."Quantity Received" + PurchaseLine."Cantidad a Merma";
+            PurchaseLine."Qty. Received (Base)" := PurchaseLine."Qty. Received (Base)" + PurchaseLine."Cantidad a Merma Base";
+            PurchaseLine."Qty. to Receive" := PurchaseLine.Quantity - PurchaseLine."Quantity Received";
+            PurchaseLine."Qty. to Receive (Base)" := PurchaseLine."Quantity (Base)" - PurchaseLine."Qty. Received (Base)";
+            PurchaseLine."Cantidad Tratada" := PurchaseLine."Cantidad a tratar";
+            PurchaseLine."Cantidad Tratada Base" := PurchaseLine."Cantidad a tratar Base";
+            PurchaseLine."Cantidad a Tratar" := PurchaseLine."Qty. to Receive";
+            PurchaseLine."Cantidad a Tratar Base" := PurchaseLine."Qty. to Receive (Base)";
+            PurchaseLine."Cantidad a Merma" := 0;
+            PurchaseLine."Cantidad a Merma Base" := 0;
+
+        end;
+        if PurchaseHeader.Recepcion = Recepcion::Uso then begin
+            PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad a uso";
+            PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad a uso Base";
+            PurchaseLine."Cantidad a Uso" := PurchaseLine."Qty. to Receive";
+            PurchaseLine."Cantidad a uso Base" := PurchaseLine."Qty. to Receive (Base)";
+
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Page Management", 'OnBeforeGetConditionalCardPageID', '', false, false)]
+    local procedure OnBeforeGetConditionalCardPageID(RecRef: RecordRef; var CardPageID: Integer; var IsHandled: Boolean);
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        If RecRef.Number = 38 Then begin
+            If Recepcion.FromInteger(Recref.Field(PurchaseHeader.FieldNo(Recepcion)).Value) = Recepcion::Tratamiento then
+                CardPageID := Page::"Tratamiento Mercancía";
+            If Recepcion.FromInteger(Recref.Field(PurchaseHeader.FieldNo(Recepcion)).Value) = Recepcion::Uso then
+                CardPageID := Page::"Uso Mercancía";
+            If Recepcion.FromInteger(Recref.Field(PurchaseHeader.FieldNo(Recepcion)).Value) = Recepcion::"Recepción" then
+                CardPageID := Page::"Recepción Mercancía";
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Header", 'OnBeforeValidateEmptySellToCustomerAndLocation', '', false, false)]
+    local procedure OnBeforeValidateEmptySellToCustomerAndLocation(var PurchaseHeader: Record "Purchase Header"; Vendor: Record Vendor; var IsHandled: Boolean; var xPurchaseHeader: Record "Purchase Header")
+    begin
+        IsHandled := PurchaseHeader.Recepcion <> Recepcion::" ";
     end;
 
 }

@@ -173,7 +173,7 @@ page 50104 "Tratamiento Mercancía"
             action("&Tratar")
             {
                 ApplicationArea = All;
-                Caption = '&RTratar';
+                Caption = '&Tratar';
                 Promoted = true;
                 PromotedCategory = Process;
                 ToolTip = 'Recibir';
@@ -363,6 +363,11 @@ page 50104 "Tratamiento Mercancía"
                 SalesLine.Insert(true);
             until PurchLine.Next() = 0;
 
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        Rec.Recepcion := Recepcion::Tratamiento;
     end;
 
     var

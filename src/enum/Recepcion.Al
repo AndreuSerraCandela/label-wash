@@ -16,8 +16,8 @@ enum 50102 Recepcion
     {
 
     }
-    value(4; Entrega)
-    {
+    // value(4; Entrega)
+    // {
 
-    }
+    // }
 }

@@ -216,20 +216,7 @@ page 50144 "Subform Recepcion"
                         DeltaUpdateTotals();
                     end;
                 }
-                field("Precio Tratamiento"; Rec."Precio Tratamiento")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    Editable = not IsBlankNumber;
-                    Enabled = not IsBlankNumber;
-                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
-                    ToolTip = 'Specifies the price of one unit of what you''re buying.';
 
-                    // trigger OnValidate()
-                    // begin
-                    //     DeltaUpdateTotals();
-                    // end;
-                }
                 field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = Suite;
@@ -308,52 +295,7 @@ page 50144 "Subform Recepcion"
                         PAGE.RunModal(0, PurchRcptLine);
                     end;
                 }
-                field("Cantidad a Uso"; Rec."Cantidad a Uso")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
-                }
-                field("Cantidad Usada"; Rec."Cantidad Usada")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
-                }
-                field("Cantidad a tratar"; Rec."Cantidad a Tratar")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
 
-
-                    trigger OnValidate()
-                    begin
-                        SetItemChargeFieldsStyle();
-                    end;
-                }
-                field("Cantidad tratada"; Rec."Cantidad Tratada")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
-
-                    // trigger OnDrillDown()
-                    // var
-                    //     PurchInvLine: Record "Purch. Inv. Line";
-                    // begin
-                    //     PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
-                    //     PurchInvLine.SetRange("Order No.", Rec."Document No.");
-                    //     PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
-                    //     PurchInvLine.SetFilter(Quantity, '<>%1', 0);
-                    //     PAGE.RunModal(0, PurchInvLine);
-                    // end;
-                }
-                field("Cantidad a Merma"; Rec."Cantidad a Merma")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the quantity of items that remains to be invoiced.';
-                }
                 field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;
