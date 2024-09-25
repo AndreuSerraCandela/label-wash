@@ -6,8 +6,14 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
+            var
+                ItemEntry: Record "Item Ledger Entry";
+                PurchaseHeader: Record "Purchase Header";
             begin
+                VereificarCantdadaTratar("No.", Quantity, "Location Code");
+                Validate("Qty. to Receive", "Cantidad a Tratar");
                 "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
+
             end;
 
         }
@@ -80,6 +86,11 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         field(50107; "Precio Tratamiento"; DECIMAL)
         {
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                validate("Direct unit cost", "Precio X Producto");
+
+            end;
 
         }
         modify("Qty. to Receive")
@@ -89,11 +100,16 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 PurchaseHeader: Record "Purchase Header";
             begin
                 if PurchaseHeader.Get("Document Type", "Document No.") then begin
-                    if PurchaseHeader.Recepcion Then begin
+                    If PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
                         "Cantidad a Tratar" := "Qty. to Receive";
                         "Cantidad a Tratar Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a Tratar Base"));
+
+                    end;
+                    If PurchaseHeader.Recepcion = Recepcion::Uso then begin
                         "Cantidad a Uso" := "Qty. to Receive";
-                        "Cantidad a Uso Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a Uso Base"));
+                        "Cantidad a uso Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a uso Base"));
+                    end;
+                    if PurchaseHeader.Recepcion <> Recepcion::" " Then begin
                         GetPriceCalculationHandler(PriceType::Sale, PurchaseHeader, PriceCalculation);
                         PriceCalculation.ApplyDiscount();
                         ApplyPrice(FieldNo(Quantity), PriceCalculation);
@@ -109,12 +125,15 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 PurchaseHeader: Record "Purchase Header";
             begin
                 if PurchaseHeader.Get("Document Type", "Document No.") then begin
-                    if PurchaseHeader.Recepcion Then begin
+                    if PurchaseHeader.Recepcion <> Recepcion::" " Then begin
                         GetPriceCalculationHandler(PriceType::Sale, PurchaseHeader, PriceCalculation);
                         PriceCalculation.ApplyDiscount();
                         ApplyPrice(FieldNo(Quantity), PriceCalculation);
                         Validate("Precio X Producto");
                     end;
+                end;
+                if PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
+                    VereificarCantdadaTratar("No.", Quantity, "Location Code");
                 end;
             end;
         }
@@ -192,5 +211,22 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
     begin
         exit(UOMMgt.CalcBaseQty(
             "No.", "Variant Code", "Unit of Measure Code", Qty, "Qty. per Unit of Measure", "Qty. Rounding Precision (Base)", FieldCaption("Qty. Rounding Precision"), FromFieldName, ToFieldName));
+    end;
+
+    local procedure VereificarCantdadaTratar(Producto: Code[20]; pQuantity: Decimal; LocationCode: Code[10])
+    var
+        ItemLegderEntry: Record "Item Ledger Entry";
+        AlmacenUso: Code[20];
+    begin
+        AlmacenUso := CopyStr(LocationCode, 1, MaxStrLen(LocationCode) - 1) + 'U';
+        ItemLegderEntry.SetCurrentKey("Item No.", Positive, "Location Code");
+        ItemLegderEntry.SetRange("Item No.", Producto);
+        ItemLegderEntry.SetRange("Location Code", AlmacenUso);
+        If ItemLegderEntry.FindSet() then begin
+            ItemLegderEntry.CalcSums("Quantity");
+            if ItemLegderEntry.Quantity < pQuantity then
+                Error('La cantidad a tratar es mayor a la cantidad en almacen de uso');
+        end else
+            Error('No se encontro el producto en almacen de uso');
     end;
 }

@@ -6,12 +6,35 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
         {
             trigger OnAfterValidate()
             begin
-                if Recepcion then begin
+                if Recepcion = Recepcion::Entrega then begin
                     Validate("Location Code", "Bill-to Customer No.");
+                end;
+                if Recepcion = Recepcion::Tratamiento then begin
+                    Validate("Location Code", "Bill-to Customer No." + 'T');
+                end;
+                if Recepcion = Recepcion::Uso then begin
+                    Validate("Location Code", "Bill-to Customer No." + 'U');
                 end;
             end;
         }
-        field(50000; Recepcion; Boolean) { }
+        modify("Buy-from Vendor No.")
+        {
+            trigger OnAfterValidate()
+            begin
+                if "Location Code" <> '' Then exit;
+                if Recepcion = Recepcion::Entrega then begin
+                    Validate("Location Code", "Bill-to Customer No.");
+                end;
+                if Recepcion = Recepcion::Tratamiento then begin
+                    Validate("Location Code", "Bill-to Customer No." + 'T');
+                end;
+                if Recepcion = Recepcion::Uso then begin
+                    Validate("Location Code", "Bill-to Customer No." + 'U');
+                end;
+            end;
+        }
+
+        field(50000; Recepcion; Enum Recepcion) { }
         field(50104; "Bill-to Customer No."; Code[20])
         {
             Caption = 'Cód Cliente';
@@ -24,7 +47,6 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
                 PurchSetup: Record "Purchases & Payables Setup";
             begin
                 TestStatusOpen();
-                recepcion := true;
                 GetCust("Bill-to Customer No.");
                 SetBillToCustomerAddressFieldsFromCustomer(Cust);
                 PurchSetup.Get();
