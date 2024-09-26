@@ -410,55 +410,55 @@ page 50102 "Mercancía Clientes"
         PurchLineTemp: Record "Purchase Line" temporary;
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
 
-    local procedure Facturar()
-    var
-        PurchHeader: Record "Purchase Header";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        ConfGrupos: Record 252;
-    begin
-        If Not PurchLineTemp.FindSet() then
-            error('Debe reclasificar los productos antes de facturar');
-        SalesHeader.Init();
-        PurchHeader.Get(Rec."Document Type", Rec."No.");
-        SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
-        SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
-        SalesHeader."Order Date" := PurchHeader."Order Date";
-        SalesHeader.Validate("Order Date", Rec."Order Date");
-        SalesHeader.Insert(true);
-        SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
-        SalesHeader.Modify(true);
-        if PurchLineTemp.FindSet() then
-            repeat
-                SalesLine.Init();
-                SalesLine."Document Type" := SalesHeader."Document Type";
-                SalesLine."Document No." := SalesHeader."No.";
-                SalesLine."Line No." := PurchLineTemp."Line No.";
-                iF PurchLineTemp.Type = PurchLineTemp.TYPE::Item then begin
-                    SalesLine.Type := SalesLine.TYPE::"G/L Account";
-                    ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLineTemp."Gen. Prod. Posting Group");
-                    ConfGrupos.TestField("Sales Account");
-                    SalesLine."No." := ConfGrupos."Sales Account";
-                end else begin
-                    SalesLine."Type" := PurchLineTemp."Type";
-                    SalesLine."No." := PurchLineTemp."No.";
-                    SalesLine."Variant Code" := PurchLineTemp."Variant Code";
-                end;
+    // local procedure Facturar()
+    // var
+    //     PurchHeader: Record "Purchase Header";
+    //     SalesHeader: Record "Sales Header";
+    //     SalesLine: Record "Sales Line";
+    //     ConfGrupos: Record 252;
+    // begin
+    //     If Not PurchLineTemp.FindSet() then
+    //         error('Debe reclasificar los productos antes de facturar');
+    //     SalesHeader.Init();
+    //     PurchHeader.Get(Rec."Document Type", Rec."No.");
+    //     SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+    //     SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
+    //     SalesHeader."Order Date" := PurchHeader."Order Date";
+    //     SalesHeader.Validate("Order Date", Rec."Order Date");
+    //     SalesHeader.Insert(true);
+    //     SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
+    //     SalesHeader.Modify(true);
+    //     if PurchLineTemp.FindSet() then
+    //         repeat
+    //             SalesLine.Init();
+    //             SalesLine."Document Type" := SalesHeader."Document Type";
+    //             SalesLine."Document No." := SalesHeader."No.";
+    //             SalesLine."Line No." := PurchLineTemp."Line No.";
+    //             iF PurchLineTemp.Type = PurchLineTemp.TYPE::Item then begin
+    //                 SalesLine.Type := SalesLine.TYPE::"G/L Account";
+    //                 ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLineTemp."Gen. Prod. Posting Group");
+    //                 ConfGrupos.TestField("Sales Account");
+    //                 SalesLine."No." := ConfGrupos."Sales Account";
+    //             end else begin
+    //                 SalesLine."Type" := PurchLineTemp."Type";
+    //                 SalesLine."No." := PurchLineTemp."No.";
+    //                 SalesLine."Variant Code" := PurchLineTemp."Variant Code";
+    //             end;
 
-                SalesLine."Quantity" := PurchLineTemp."Cantidad a Tratar";
-                SalesLine."Quantity (Base)" := PurchLineTemp."Cantidad a Tratar Base";
-                SalesLine."Unit of Measure" := PurchLineTemp."Unit of Measure";
-                SalesLine.vALIDATE("Unit Price", PurchLineTemp."Precio X Producto");
-                SalesLine.Description := PurchLinetemp.Description;
-                SalesLine.Insert(true);
-            until PurchLineTemp.Next() = 0;
+    //             SalesLine."Quantity" := PurchLineTemp."Cantidad a Tratar";
+    //             SalesLine."Quantity (Base)" := PurchLineTemp."Cantidad a Tratar Base";
+    //             SalesLine."Unit of Measure" := PurchLineTemp."Unit of Measure";
+    //             SalesLine.vALIDATE("Unit Price", PurchLineTemp."Precio X Producto");
+    //             SalesLine.Description := PurchLinetemp.Description;
+    //             SalesLine.Insert(true);
+    //         until PurchLineTemp.Next() = 0;
 
-    end;
+    // end;
 
-    local procedure RunItemJnlPostLine(var ItemJnlLineToPost: Record "Item Journal Line")
-    begin
-        ItemJnlPostLine.RunWithCheck(ItemJnlLineToPost);
-    end;
+    // local procedure RunItemJnlPostLine(var ItemJnlLineToPost: Record "Item Journal Line")
+    // begin
+    //     ItemJnlPostLine.RunWithCheck(ItemJnlLineToPost);
+    // end;
 
     local procedure InitPurch(var PurchHeader: Record "Purchase Header"; Rec: Record "Purchase Header")
     begin

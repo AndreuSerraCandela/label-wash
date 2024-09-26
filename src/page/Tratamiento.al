@@ -205,6 +205,7 @@ page 50104 "Tratamiento Mercancía"
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
         IsScheduledPosting: Boolean;
         DocumentIsPosted: Boolean;
+        PurchaseReceipLine: Record "Purch. Rcpt. Line";
     begin
         LinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
         Rec.Invoice := false;
@@ -213,7 +214,11 @@ page 50104 "Tratamiento Mercancía"
 
         IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         DocumentIsPosted := (not PurchaseHeader.Get(Rec."Document Type", Rec."No.")) or IsScheduledPosting;
-
+        Commit();
+        If PurchaseHeader."Last Receiving No." = '' then
+            PurchaseHeader."Last Receiving No." := PurchaseHeader."Receiving No.";
+        PurchaseReceipLine.SetRange("Document No.", PurchaseHeader."Last Receiving No.");
+        if PurchaseReceipLine.FindSet() Then Tratamiento(PurchaseHeader."Last Receiving No.");
         if IsScheduledPosting then
             CurrPage.Close();
         CurrPage.Update(false);
@@ -309,61 +314,118 @@ page 50104 "Tratamiento Mercancía"
                 SalesLine.Description := PurchLine.Description;
                 SalesLine.Insert(true);
             until PurchLine.Next() = 0;
-
+        Commit();
+        Page.Runmodal(0, SalesHeader);
     end;
 
-    local procedure FacturarRecepcion()
+    // local procedure FacturarRecepcion()
+    // var
+    //     PurchLine: Record "Purchase Line";
+    //     PurchHeader: Record "Purchase Header";
+    //     SalesHeader: Record "Sales Header";
+    //     SalesLine: Record "Sales Line";
+    //     ConfGrupos: Record 252;
+    // begin
+    //     SalesHeader.Init();
+    //     PurchHeader.Get(Rec."Document Type", Rec."No.");
+    //     SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+    //     SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
+    //     SalesHeader."Order Date" := PurchHeader."Order Date";
+    //     SalesHeader.Validate("Order Date", Rec."Order Date");
+    //     SalesHeader.Insert(true);
+    //     SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
+    //     SalesHeader.Modify(true);
+    //     PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+    //     PurchLine.SetRange("Document No.", PurchHeader."No.");
+    //     PurchLine.SetFilter("Qty. Rcd. Not Invoiced", '<>%1', 0);
+    //     If not PurchLine.FindSet() then
+    //         Error('Compruebe si ha recibido la mercancía, y si no la ha facturado');
+    //     if PurchLine.FindSet() then
+    //         repeat
+    //             SalesLine.Init();
+    //             SalesLine."Document Type" := SalesHeader."Document Type";
+    //             SalesLine."Document No." := SalesHeader."No.";
+    //             SalesLine."Line No." := PurchLine."Line No.";
+    //             iF PurchLine.Type = PurchLine.TYPE::Item then begin
+    //                 SalesLine.Type := SalesLine.TYPE::"G/L Account";
+    //                 ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+    //                 ConfGrupos.TestField("Sales Account");
+    //                 SalesLine."No." := ConfGrupos."Sales Account";
+    //             end else begin
+    //                 SalesLine."Type" := PurchLine."Type";
+    //                 SalesLine."No." := PurchLine."No.";
+    //                 SalesLine."Variant Code" := PurchLine."Variant Code";
+    //             end;
+
+    //             SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
+    //             PurchLine."Quantity Invoiced" += PurchLine."Qty. Rcd. Not Invoiced";
+    //             PurchLine."Qty. Rcd. Not Invoiced" := 0;
+    //             SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
+    //             PurchLine."Qty. Invoiced (Base)" += PurchLine."Qty. Rcd. Not Invoiced (Base)";
+    //             PurchLine."Qty. Rcd. Not Invoiced (Base)" := 0;
+    //             SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
+    //             SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+    //             SalesLine.Description := PurchLine.Description;
+    //             SalesLine.Insert(true);
+    //         until PurchLine.Next() = 0;
+
+    // end;
+    local procedure Tratamiento(DocumentNo: Code[20])
     var
-        PurchLine: Record "Purchase Line";
-        PurchHeader: Record "Purchase Header";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        ConfGrupos: Record 252;
+        location: Record Location;
+        ItemJnlLine: Record "Item Journal Line";
+        OriginalItemJnlLine: Record "Item Journal Line";
+        TempWhseJnlLine: Record "Warehouse Journal Line" temporary;
+        TempWhseTrackingSpecification: Record "Tracking Specification" temporary;
+        TempTrackingSpecificationChargeAssmt: Record "Tracking Specification" temporary;
+        TempReservationEntry: Record "Reservation Entry" temporary;
+        PostWhseJnlLine: Boolean;
+        CheckApplToItemEntry: Boolean;
+        PostJobConsumptionBeforePurch: Boolean;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        IsHandled: Boolean;
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        ItemLedgShptEntryNo: Integer;
+        CantidadaUsar: Decimal;
+        CantidadaUsarBase: Decimal;
+        ConfInv: Record "inventory posting setup";
+        ConfInvT: Record "inventory posting setup";
+        ConfInvM: Record "inventory posting setup";
     begin
-        SalesHeader.Init();
-        PurchHeader.Get(Rec."Document Type", Rec."No.");
-        SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
-        SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
-        SalesHeader."Order Date" := PurchHeader."Order Date";
-        SalesHeader.Validate("Order Date", Rec."Order Date");
-        SalesHeader.Insert(true);
-        SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
-        SalesHeader.Modify(true);
-        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
-        PurchLine.SetRange("Document No.", PurchHeader."No.");
-        PurchLine.SetFilter("Qty. Rcd. Not Invoiced", '<>%1', 0);
-        If not PurchLine.FindSet() then
-            Error('Compruebe si ha recibido la mercancía, y si no la ha facturado');
-        if PurchLine.FindSet() then
-            repeat
-                SalesLine.Init();
-                SalesLine."Document Type" := SalesHeader."Document Type";
-                SalesLine."Document No." := SalesHeader."No.";
-                SalesLine."Line No." := PurchLine."Line No.";
-                iF PurchLine.Type = PurchLine.TYPE::Item then begin
-                    SalesLine.Type := SalesLine.TYPE::"G/L Account";
-                    ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
-                    ConfGrupos.TestField("Sales Account");
-                    SalesLine."No." := ConfGrupos."Sales Account";
-                end else begin
-                    SalesLine."Type" := PurchLine."Type";
-                    SalesLine."No." := PurchLine."No.";
-                    SalesLine."Variant Code" := PurchLine."Variant Code";
-                end;
 
-                SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
-                PurchLine."Quantity Invoiced" += PurchLine."Qty. Rcd. Not Invoiced";
-                PurchLine."Qty. Rcd. Not Invoiced" := 0;
-                SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
-                PurchLine."Qty. Invoiced (Base)" += PurchLine."Qty. Rcd. Not Invoiced (Base)";
-                PurchLine."Qty. Rcd. Not Invoiced (Base)" := 0;
-                SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
-                SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
-                SalesLine.Description := PurchLine.Description;
-                SalesLine.Insert(true);
-            until PurchLine.Next() = 0;
+        PurchRcptHeader.Get(DocumentNo);
+
+
+        PurchRcptLine.SetRange("Document No.", PurchRcptHeader."No.");
+        if PurchRcptLine.FindFirst() then
+            repeat
+
+                ItemJnlLine.Init();
+                PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchRcptLine."Order No.");
+                ItemJnlLine.CopyFromPurchHeader(PurchaseHeader);
+                PurchaseLine.Get(PurchaseHeader."Document Type"::Order, PurchaseHeader."No.", PurchRcptLine."Order Line No.");
+                ItemJnlLine.CopyFromPurchLine(PurchaseLine);
+                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine."Document No." := PurchaseHeader."No.";
+                ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
+                ItemJnlLine.Quantity := -PurchRcptLine."Qty. Rcd. Not Invoiced";
+                ItemJnlLine."Quantity (Base)" := -PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
+                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'U');
+                ItemJnlLine."Invoiced Quantity" := 0;
+                ItemJnlLine."Invoiced Qty. (Base)" := 0;
+                if ItemJnlLine.Quantity <> 0 Then
+                    RunItemJnlPostLine(ItemJnlLine);
+                PurchRcptLine."Qty. Rcd. Not Invoiced" := 0;
+                PurchRcptLine.Modify();
+            until PurchRcptLine.Next() = 0;
+
+
 
     end;
+
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
