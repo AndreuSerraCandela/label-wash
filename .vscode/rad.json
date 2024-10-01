@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 ﻿{"Added":[],"Modified":[{"Id":50104,"Kind":12,"Name":"Tratamiento Mercancía","Namespace":""},{"Id":50103,"Kind":12,"Name":"Uso Mercancía","Namespace":""},{"Id":50100,"Kind":12,"Name":"Recepción Mercancía","Namespace":""}],"Removed":[]}
+=======
+﻿{"Added":[],"Modified":[{"Id":50100,"Kind":11,"Name":"EventosTratamientos","Namespace":""},{"Id":50144,"Kind":12,"Name":"Subform Recepcion","Namespace":""},{"Id":50100,"Kind":17,"Name":"PurchaseHeaderExtension","Namespace":""},{"Id":50105,"Kind":17,"Name":"PurchaseLineExtension","Namespace":""},{"Id":50100,"Kind":12,"Name":"Recepción Mercancía","Namespace":""}],"Removed":[{"Id":50102,"Kind":12,"Name":"Recepciones Mercancía","Namespace":""}]}
+>>>>>>> 16723029f6106daeb891642cea1286f532e4aab6
