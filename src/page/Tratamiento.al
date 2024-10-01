@@ -2,6 +2,7 @@ page 50104 "Tratamiento Mercancía"
 {
     PageType = Card;
     SourceTable = "Purchase Header";
+    Permissions = tabledata 121 = rimd;
     SourceTableView = where("Document Type" = CONST(Order), Recepcion = filter(Recepcion::Tratamiento));
     Layout
     {
@@ -195,6 +196,19 @@ page 50104 "Tratamiento Mercancía"
                 begin
                     Facturar();
                 end;
+            }
+
+        }
+        area(Navigation)
+        {
+            action(Recepciones)
+            {
+                ApplicationArea = Suite;
+                Image = PostedReceipts;
+                RunObject = Page "Posted Purchase Receipts";
+                RunPageLink = "Order No." = field("No.");
+                RunPageView = sorting("Order No.");
+                ToolTip = 'View a list of posted purchase receipts for the order.';
             }
         }
     }
@@ -411,8 +425,8 @@ page 50104 "Tratamiento Mercancía"
                 ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
                 ItemJnlLine."Document No." := PurchaseHeader."No.";
                 ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
-                ItemJnlLine.Quantity := -PurchRcptLine."Qty. Rcd. Not Invoiced";
-                ItemJnlLine."Quantity (Base)" := -PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
+                ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced";
+                ItemJnlLine."Quantity (Base)" := PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
                 ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'U');
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;

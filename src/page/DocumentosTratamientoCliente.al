@@ -2,7 +2,7 @@ page 50102 "Mercancía Clientes"
 {
     PageType = list;
     SourceTable = "Purchase Header";
-    CardPageId = "Recepción Mercancía";
+    //CardPageId = "Recepción Mercancía";
     UsageCategory = Lists;
     ModifyAllowed = false;
     ApplicationArea = All;
@@ -160,6 +160,27 @@ page 50102 "Mercancía Clientes"
     }
     actions
     {
+        area(Navigation)
+        {
+            action(Editar)
+            {
+                ApplicationArea = All;
+                Caption = 'Editar';
+                Image = Edit;
+                RunPageMode = Edit;
+                trigger OnAction()
+                begin
+                    case Rec.Recepcion of
+                        Recepcion::"Recepción":
+                            Page.Run(pAGE::"Recepción Mercancía", Rec);
+                        Recepcion::Uso:
+                            Page.Run(pAGE::"Uso Mercancía", Rec);
+                        Recepcion::Tratamiento:
+                            Page.Run(pAGE::"Tratamiento Mercancía", Rec);
+                    end;
+                end;
+            }
+        }
         area(Processing)
         {
 
@@ -167,7 +188,7 @@ page 50102 "Mercancía Clientes"
             {
                 ApplicationArea = All;
                 Caption = 'Recepcion mercancia Nueva';
-                Image = Recalculate;
+                Image = Receipt;
                 RunObject = Page "Recepción Mercancía";
                 RunPageMode = Create;
 
@@ -177,7 +198,7 @@ page 50102 "Mercancía Clientes"
             {
                 ApplicationArea = All;
                 Caption = 'Envio Para uso desde Cliente';
-                Image = Recalculate;
+                Image = WarehouseRegisters;
                 trigger OnAction()
                 var
 
@@ -198,22 +219,22 @@ page 50102 "Mercancía Clientes"
                         InitPurch(PurchHeader, Rec);
                         PurchHeader.Recepcion := Recepcion::Uso;
                         PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
-                        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
+                        PurchHeader.Validate("Bill-to Customer No.", Rec."Bill-to Customer No.");
                         PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
-                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
+                        PurchHeader."Location Code" := Rec."Bill-to Customer No." + 'U';
                         PurchHeader."No." := '';
                         PurchHeader.Insert(true);
 
-                        If Not Location.Get(Rec."Location Code" + 'U') Then begin
+                        If Not Location.Get(Rec."Bill-to Customer No." + 'U') Then begin
                             location.Init();
-                            location."Code" := Rec."Location Code" + 'U';
-                            location."Name" := Rec."Location Code" + 'U';
+                            location."Code" := Rec."Bill-to Customer No." + 'U';
+                            location."Name" := Rec."Bill-to Customer No." + 'U';
                             location.Insert();
                             ConfInv.SetRange("Location Code", Rec."Location Code");
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;
-                                    ConfInvT."Location Code" := Rec."Location Code" + 'U';
+                                    ConfInvT."Location Code" := Rec."Bill-to Customer No." + 'U';
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
@@ -271,21 +292,21 @@ page 50102 "Mercancía Clientes"
                         PurchHeader.Recepcion := Recepcion::Tratamiento;
                         PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
                         PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
-                        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
-                        PurchHeader."Location Code" := Rec."Location Code" + 'T';
+                        PurchHeader.Validate("Bill-to Customer No.", Rec."Bill-to Customer No.");
+                        PurchHeader."Location Code" := Rec."Bill-to Customer No." + 'T';
                         PurchHeader."No." := '';
                         PurchHeader.Insert(true);
 
-                        If Not Location.Get(Rec."Location Code" + 'T') Then begin
+                        If Not Location.Get(Rec."Bill-to Customer No." + 'T') Then begin
                             location.Init();
-                            location."Code" := Rec."Location Code" + 'T';
-                            location."Name" := Rec."Location Code" + 'T';
+                            location."Code" := Rec."Bill-to Customer No." + 'T';
+                            location."Name" := Rec."Bill-to Customer No." + 'T';
                             location.Insert();
                             ConfInv.SetRange("Location Code", Rec."Location Code");
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;
-                                    ConfInvT."Location Code" := Rec."Location Code" + 'T';
+                                    ConfInvT."Location Code" := Rec."Bill-to Customer No." + 'T';
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
@@ -322,7 +343,7 @@ page 50102 "Mercancía Clientes"
             {
                 ApplicationArea = All;
                 Caption = 'Envio Para uso desde Tratamiento';
-                Image = Recalculate;
+                Image = WageLines;
                 trigger OnAction()
                 var
 
@@ -342,23 +363,23 @@ page 50102 "Mercancía Clientes"
                     If ItemJnlLine.FindSet() then begin
                         InitPurch(PurchHeader, Rec);
                         PurchHeader.Recepcion := Recepcion::Uso;
-                        PurchHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
+                        PurchHeader.Validate("Bill-to Customer No.", Rec."Bill-to Customer No.");
                         PurchHeader."No. Series" := PruchSetup."Recepcion Tratamientos";
                         PurchHeader."Receiving No. Series" := PruchSetup."Recepciones Tratamientos";
-                        PurchHeader."Location Code" := Rec."Location Code" + 'U';
+                        PurchHeader."Location Code" := Rec."Bill-to Customer No." + 'U';
                         PurchHeader."No." := '';
                         PurchHeader.Insert(true);
 
-                        If Not Location.Get(Rec."Location Code" + 'U') Then begin
+                        If Not Location.Get(Rec."Bill-to Customer No." + 'U') Then begin
                             location.Init();
-                            location."Code" := Rec."Location Code" + 'U';
-                            location."Name" := Rec."Location Code" + 'U';
+                            location."Code" := Rec."Bill-to Customer No." + 'U';
+                            location."Name" := Rec."Bill-to Customer No." + 'U';
                             location.Insert();
                             ConfInv.SetRange("Location Code", Rec."Location Code");
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;
-                                    ConfInvT."Location Code" := Rec."Location Code" + 'U';
+                                    ConfInvT."Location Code" := Rec."Bill-to Customer No." + 'U';
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
@@ -404,6 +425,14 @@ page 50102 "Mercancía Clientes"
             //         Facturar();
             //     end;
             // }
+        }
+        area(Promoted)
+        {
+            actionref(Edit_Ref; Editar) { }
+            actionref(Recepcion_mercancia_Nueva_Ref; "Recepcion mercancia Nueva") { }
+            actionref(Envio_Para_uso_desde_Cliente_Ref; "Envio Para uso desde Cliente") { }
+            actionref(Recepcion_para_tratar_Ref; "Recepcion para tratar") { }
+            actionref(Envio_Para_uso_desde_Tratamiento_Ref; "Envio Para uso desde Tratamiento") { }
         }
     }
     var

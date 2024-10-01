@@ -10,7 +10,9 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 ItemEntry: Record "Item Ledger Entry";
                 PurchaseHeader: Record "Purchase Header";
             begin
-                VereificarCantdadaTratar("No.", Quantity, "Location Code");
+                If Not PurchaseHeader.Get("Document Type", "Document No.") then
+                    PurchaseHeader.Init();
+                VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
                 Validate("Qty. to Receive", "Cantidad a Tratar");
                 "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
 
@@ -133,7 +135,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                     end;
                 end;
                 if PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
-                    VereificarCantdadaTratar("No.", Quantity, "Location Code");
+                    VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
                 end;
             end;
         }
@@ -213,12 +215,12 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             "No.", "Variant Code", "Unit of Measure Code", Qty, "Qty. per Unit of Measure", "Qty. Rounding Precision (Base)", FieldCaption("Qty. Rounding Precision"), FromFieldName, ToFieldName));
     end;
 
-    local procedure VereificarCantdadaTratar(Producto: Code[20]; pQuantity: Decimal; LocationCode: Code[10])
+    local procedure VereificarCantdadaTratar(Producto: Code[20]; pQuantity: Decimal; LocationCode: Code[10]; Cliente: Code[20])
     var
         ItemLegderEntry: Record "Item Ledger Entry";
         AlmacenUso: Code[20];
     begin
-        AlmacenUso := CopyStr(LocationCode, 1, MaxStrLen(LocationCode) - 1) + 'U';
+        AlmacenUso := Cliente + 'U';
         ItemLegderEntry.SetCurrentKey("Item No.", Positive, "Location Code");
         ItemLegderEntry.SetRange("Item No.", Producto);
         ItemLegderEntry.SetRange("Location Code", AlmacenUso);

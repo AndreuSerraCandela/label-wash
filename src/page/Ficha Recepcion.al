@@ -244,10 +244,9 @@ page 50100 "Recepción Mercancía"
         }
         area(Navigation)
         {
-            action(Receipts)
+            action(Recepciones)
             {
                 ApplicationArea = Suite;
-                Caption = 'Receipts';
                 Image = PostedReceipts;
                 RunObject = Page "Posted Purchase Receipts";
                 RunPageLink = "Order No." = field("No.");

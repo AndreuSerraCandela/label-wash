@@ -47,6 +47,8 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
                 PurchSetup: Record "Purchases & Payables Setup";
             begin
                 TestStatusOpen();
+                If StrLen("Bill-to Customer No.") > 8 then
+                    Error('El código del cliente no debe exceder los 8 caracteres');
                 GetCust("Bill-to Customer No.");
                 SetBillToCustomerAddressFieldsFromCustomer(Cust);
                 PurchSetup.Get();
@@ -57,6 +59,8 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
                 Validate("Buy-from Vendor No.", PurchSetup."Proveedor Tratamientos");
                 validate("no. series", purchsetup."Recepcion Tratamientos");
                 validate("Receiving No. Series", purchsetup."Recepciones Tratamientos");
+                "Payment Method Code" := Cust."Payment Method Code";
+                "Payment Terms Code" := Cust."Payment Terms Code";
                 If Cust."Location Code" <> '' then Validate("Location Code", Cust."Location Code");
                 if Cust."Location Code" = '' then begin
                     If Not Location.Get("Bill-to Customer No.") then
