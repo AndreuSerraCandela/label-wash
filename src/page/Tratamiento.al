@@ -428,7 +428,10 @@ page 50104 "Tratamiento Mercancía"
                 ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
                 ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced" + PurchaseLine."Cantidad a Merma";
                 ItemJnlLine."Quantity (Base)" := PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
-                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'U');
+                if PurchaseLine."From-Location Code" <> '' then
+                    ItemJnlLine.Validate("Location Code", PurchaseLine."From-Location Code")
+                else
+                    ItemJnlLine.Validate("Location Code", PurchaseHeader.AlmacenCliente(PurchaseHeader."Bill-to Customer No.", Recepcion::Uso, false));
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 if ItemJnlLine.Quantity <> 0 Then
@@ -451,7 +454,7 @@ page 50104 "Tratamiento Mercancía"
                 PurchaseLine."Cantidad a Merma" := 0;
                 PurchaseLine."Cantidad a Merma Base" := 0;
                 PurchaseLine.Modify();
-                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'M');
+                ItemJnlLine.Validate("Location Code", PurchaseHeader.AlmacenCliente(PurchaseHeader."Bill-to Customer No.", Recepcion::Uso, true));
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 if ItemJnlLine.Quantity <> 0 Then

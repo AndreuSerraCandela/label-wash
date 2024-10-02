@@ -153,6 +153,12 @@ page 50147 "Subform Uso"
                     ToolTip = 'Specifies information in addition to the description.';
                     Visible = false;
                 }
+                field("From-Location Code"; Rec."From-Location Code")
+                {
+                    ApplicationArea = Location;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                }
 
                 field("Location Code"; Rec."Location Code")
                 {

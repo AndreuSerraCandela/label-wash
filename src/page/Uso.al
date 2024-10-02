@@ -413,7 +413,10 @@ page 50103 "Uso Mercancía"
                 ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
                 ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced";
                 ItemJnlLine."Quantity (Base)" := PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
-                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'R');
+                if PurchaseLine."From-Location Code" <> '' then
+                    ItemJnlLine.Validate("Location Code", PurchaseLine."From-Location Code")
+                else
+                    ItemJnlLine.Validate("Location Code", PurchaseHeader.AlmacenCliente(PurchaseHeader."Bill-to Customer No.", Recepcion::"Recepción", false));
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 if ItemJnlLine.Quantity <> 0 Then

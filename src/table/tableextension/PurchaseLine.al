@@ -12,13 +12,18 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             begin
                 If Not PurchaseHeader.Get("Document Type", "Document No.") then
                     PurchaseHeader.Init();
-                if Not "No Avisar" Then
-                    VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
+                VereificarCantidad("No.", "Cantidad a Tratar", "From-Location Code", "Location Code");
                 Validate("Qty. to Receive", "Cantidad a Tratar" + "Cantidad a Merma");
                 "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
 
             end;
 
+        }
+        field(50099; "From-Location Code"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            TableRelation = "Location";
+            Caption = 'Almacen origen';
         }
         field(50108; "Cantidad a uso Base"; Decimal)
         {
@@ -29,6 +34,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
+                VereificarCantidad("No.", "Cantidad a Uso", "From-Location Code", "Location Code");
                 "Cantidad a uso Base" := CalcBaseQty("Cantidad a Uso", FieldCaption("Cantidad a Uso"), FieldCaption("Cantidad a Uso Base"));
             end;
 
@@ -43,7 +49,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             trigger OnValidate()
             begin
                 Validate("Cantidad a Tratar", Quantity - "Cantidad Tratada" - "Cantidad a Merma");
-                "Cantidad a Merma Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
+                "Cantidad a Merma Base" := CalcBaseQty("Cantidad a Merma", FieldCaption("Cantidad a Merma"), FieldCaption("Cantidad a Merma Base"));
 
             end;
 
@@ -136,13 +142,17 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                     end;
                 end;
                 if PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
-                    if Not "No Avisar" Then
-                        VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
+                    VereificarCantidad("No.", Quantity, "From-Location Code", "Location Code");
+                end;
+                if PurchaseHeader.Recepcion = Recepcion::Uso then begin
+                    VereificarCantidad("No.", Quantity, "from-Location Code", "Location Code");
                 end;
             end;
         }
         field(50112; "No Avisar"; Boolean)
         {
+            ObsoleteReason = 'No se usa';
+            ObsoleteState = Removed;
             DataClassification = CustomerContent;
         }
 
@@ -221,21 +231,21 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             "No.", "Variant Code", "Unit of Measure Code", Qty, "Qty. per Unit of Measure", "Qty. Rounding Precision (Base)", FieldCaption("Qty. Rounding Precision"), FromFieldName, ToFieldName));
     end;
 
-    local procedure VereificarCantdadaTratar(Producto: Code[20]; pQuantity: Decimal; LocationCode: Code[10]; Cliente: Code[20])
+    local procedure VereificarCantidad(Producto: Code[20]; pQuantity: Decimal; FromCode: Code[10]; ToCode: Code[20])
     var
         ItemLegderEntry: Record "Item Ledger Entry";
         AlmacenUso: Code[20];
     begin
 
-        AlmacenUso := Cliente + 'U';
+        AlmacenUso := FromCode;
         ItemLegderEntry.SetCurrentKey("Item No.", Positive, "Location Code");
         ItemLegderEntry.SetRange("Item No.", Producto);
         ItemLegderEntry.SetRange("Location Code", AlmacenUso);
         If ItemLegderEntry.FindSet() then begin
             ItemLegderEntry.CalcSums("Quantity");
             if ItemLegderEntry.Quantity < pQuantity then
-                Error('La cantidad a tratar es mayor a la cantidad en almacen de uso');
+                Error('La cantidad a tratar es mayor a la cantidad en almacen %1', AlmacenUso);
         end else
-            Error('No se encontro el producto en almacen de uso');
+            Error('No se encontro el producto en almacen %1', AlmacenUso);
     end;
 }

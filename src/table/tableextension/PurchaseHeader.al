@@ -6,15 +6,8 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
         {
             trigger OnAfterValidate()
             begin
-                if Recepcion = Recepcion::"Recepción" then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'R');
-                end;
-                if Recepcion = Recepcion::Tratamiento then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'T');
-                end;
-                if Recepcion = Recepcion::Uso then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'U');
-                end;
+                Validate("Location Code", AlmacenCliente("Bill-to Customer No.", Recepcion, false));
+
             end;
         }
         modify("Buy-from Vendor No.")
@@ -23,13 +16,13 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
             begin
                 if "Location Code" <> '' Then exit;
                 if Recepcion = Recepcion::"Recepción" then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'R');
+                    Validate("Location Code", AlmacenCliente("Bill-to Customer No.", Recepcion::"Recepción", false));
                 end;
                 if Recepcion = Recepcion::Tratamiento then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'T');
+                    Validate("Location Code", AlmacenCliente("Bill-to Customer No.", Recepcion::Tratamiento, false));
                 end;
                 if Recepcion = Recepcion::Uso then begin
-                    Validate("Location Code", "Bill-to Customer No." + 'U');
+                    Validate("Location Code", AlmacenCliente("Bill-to Customer No.", Recepcion::Uso, false));
                 end;
             end;
         }
@@ -478,6 +471,26 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
             exit(true);
         end;
         exit(false);
+    end;
+
+    Procedure AlmacenCliente(Cliente: Code[20]; Tipo: Enum Recepcion; Merma: Boolean): Text
+    var
+        Cust: Record Customer;
+        LocationCode: Code[10];
+    begin
+        Cust.Get(Cliente);
+        LocationCode := Cust."Location Code";
+        Cust."Location Code" := Copystr(Cust."Location Code", 1, StrLen(Cust."Location Code") - 1);
+        If Merma then
+            exit(Cust."Location Code" + 'M');
+        case Tipo of
+            Recepcion::"Recepción":
+                exit(LocationCode);
+            Recepcion::Tratamiento:
+                exit(Cust."Location Code" + 'T');
+            Recepcion::Uso:
+                exit(Cust."Location Code" + 'U');
+        end;
     end;
 
     var
