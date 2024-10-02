@@ -12,8 +12,9 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             begin
                 If Not PurchaseHeader.Get("Document Type", "Document No.") then
                     PurchaseHeader.Init();
-                VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
-                Validate("Qty. to Receive", "Cantidad a Tratar");
+                if Not "No Avisar" Then
+                    VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
+                Validate("Qty. to Receive", "Cantidad a Tratar" + "Cantidad a Merma");
                 "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
 
             end;
@@ -103,8 +104,8 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             begin
                 if PurchaseHeader.Get("Document Type", "Document No.") then begin
                     If PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
-                        "Cantidad a Tratar" := "Qty. to Receive";
-                        "Cantidad a Tratar Base" := CalcBaseQty("Qty. to Receive", FieldCaption("Qty. to Receive"), FieldCaption("Cantidad a Tratar Base"));
+                        "Cantidad a Tratar" := "Qty. to Receive" - "Cantidad a Merma";
+                        "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
 
                     end;
                     If PurchaseHeader.Recepcion = Recepcion::Uso then begin
@@ -135,9 +136,14 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                     end;
                 end;
                 if PurchaseHeader.Recepcion = Recepcion::Tratamiento then begin
-                    VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
+                    if Not "No Avisar" Then
+                        VereificarCantdadaTratar("No.", Quantity, "Location Code", PurchaseHeader."Bill-to Customer No.");
                 end;
             end;
+        }
+        field(50112; "No Avisar"; Boolean)
+        {
+            DataClassification = CustomerContent;
         }
 
     }
@@ -220,6 +226,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         ItemLegderEntry: Record "Item Ledger Entry";
         AlmacenUso: Code[20];
     begin
+
         AlmacenUso := Cliente + 'U';
         ItemLegderEntry.SetCurrentKey("Item No.", Positive, "Location Code");
         ItemLegderEntry.SetRange("Item No.", Producto);

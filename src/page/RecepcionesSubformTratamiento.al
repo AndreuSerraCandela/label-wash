@@ -464,23 +464,6 @@ page 50146 "Subform Tratamiento"
                     ToolTip = 'Specifies the number of this line.';
                     Visible = false;
                 }
-                field("Over-Receipt Quantity"; Rec."Over-Receipt Quantity")
-                {
-                    ApplicationArea = All;
-                    Visible = OverReceiptAllowed;
-                    ToolTip = 'Specifies over-receipt quantity.';
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Over-Receipt Code"; Rec."Over-Receipt Code")
-                {
-                    ApplicationArea = All;
-                    Visible = OverReceiptAllowed;
-                    ToolTip = 'Specifies over-receipt code.';
-                }
                 field("Gross Weight"; Rec."Gross Weight")
                 {
                     Caption = 'Unit Gross Weight';

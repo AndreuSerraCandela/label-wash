@@ -211,34 +211,34 @@ page 50147 "Subform Uso"
 
 
 
-                field("Cantidad a Usar"; Rec."Cantidad a Tratar")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
+                // field("Cantidad a Usar"; Rec."Cantidad a Tratar")
+                // {
+                //     ApplicationArea = Suite;
+                //     BlankZero = true;
 
 
-                    trigger OnValidate()
-                    begin
-                        SetItemChargeFieldsStyle();
-                    end;
-                }
-                field("Cantidad Usada"; Rec."Cantidad Tratada")
-                {
-                    ApplicationArea = Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+                //     trigger OnValidate()
+                //     begin
+                //         SetItemChargeFieldsStyle();
+                //     end;
+                // }
+                // field("Cantidad Usada"; Rec."Cantidad Tratada")
+                // {
+                //     ApplicationArea = Suite;
+                //     BlankZero = true;
+                //     ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
 
-                    // trigger OnDrillDown()
-                    // var
-                    //     PurchInvLine: Record "Purch. Inv. Line";
-                    // begin
-                    //     PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
-                    //     PurchInvLine.SetRange("Order No.", Rec."Document No.");
-                    //     PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
-                    //     PurchInvLine.SetFilter(Quantity, '<>%1', 0);
-                    //     PAGE.RunModal(0, PurchInvLine);
-                    // end;
-                }
+                //     // trigger OnDrillDown()
+                //     // var
+                //     //     PurchInvLine: Record "Purch. Inv. Line";
+                //     // begin
+                //     //     PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
+                //     //     PurchInvLine.SetRange("Order No.", Rec."Document No.");
+                //     //     PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
+                //     //     PurchInvLine.SetFilter(Quantity, '<>%1', 0);
+                //     //     PAGE.RunModal(0, PurchInvLine);
+                //     // end;
+                // }
                 field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;
@@ -400,23 +400,6 @@ page 50147 "Subform Uso"
                     Editable = false;
                     ToolTip = 'Specifies the number of this line.';
                     Visible = false;
-                }
-                field("Over-Receipt Quantity"; Rec."Over-Receipt Quantity")
-                {
-                    ApplicationArea = All;
-                    Visible = OverReceiptAllowed;
-                    ToolTip = 'Specifies over-receipt quantity.';
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.Update(true);
-                    end;
-                }
-                field("Over-Receipt Code"; Rec."Over-Receipt Code")
-                {
-                    ApplicationArea = All;
-                    Visible = OverReceiptAllowed;
-                    ToolTip = 'Specifies over-receipt code.';
                 }
                 field("Gross Weight"; Rec."Gross Weight")
                 {

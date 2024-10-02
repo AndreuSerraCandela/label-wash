@@ -214,7 +214,7 @@ page 50102 "Mercancía Clientes"
                 begin
                     PruchSetup.Get();
 
-                    ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No.");
+                    ItemJnlLine.SetRange("Location Code", Rec."Bill-to Customer No." + 'R');
                     If ItemJnlLine.FindSet() then begin
                         InitPurch(PurchHeader, Rec);
                         PurchHeader.Recepcion := Recepcion::Uso;
@@ -230,7 +230,7 @@ page 50102 "Mercancía Clientes"
                             location."Code" := Rec."Bill-to Customer No." + 'U';
                             location."Name" := Rec."Bill-to Customer No." + 'U';
                             location.Insert();
-                            ConfInv.SetRange("Location Code", Rec."Location Code");
+                            ConfInv.SetRange("Location Code", Rec."Bill-to Customer No." + 'R');
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;
@@ -302,11 +302,24 @@ page 50102 "Mercancía Clientes"
                             location."Code" := Rec."Bill-to Customer No." + 'T';
                             location."Name" := Rec."Bill-to Customer No." + 'T';
                             location.Insert();
-                            ConfInv.SetRange("Location Code", Rec."Location Code");
+                            ConfInv.SetRange("Location Code", Rec."Bill-to Customer No." + 'U');
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;
                                     ConfInvT."Location Code" := Rec."Bill-to Customer No." + 'T';
+                                    If ConfInvT.Insert() Then;
+                                until ConfInv.Next() = 0;
+                        end;
+                        If Not Location.Get(Rec."Bill-to Customer No." + 'M') Then begin
+                            location.Init();
+                            location."Code" := Rec."Bill-to Customer No." + 'M';
+                            location."Name" := Rec."Bill-to Customer No." + 'M';
+                            location.Insert();
+                            ConfInv.SetRange("Location Code", Rec."Bill-to Customer No." + 'U');
+                            if ConfInv.FindSet() then
+                                repeat
+                                    ConfInvT := ConfInv;
+                                    ConfInvT."Location Code" := Rec."Bill-to Customer No." + 'M';
                                     If ConfInvT.Insert() Then;
                                 until ConfInv.Next() = 0;
                         end;
@@ -316,6 +329,7 @@ page 50102 "Mercancía Clientes"
                             PurchLine.SetRange("Document No.", PurchHeader."No.");
                             PurchLine.SetRange("No.", ItemJnlLine."Item No.");
                             if PurchLine.FindFirst() then begin
+                                PurchLine."No Avisar" := true;
                                 PurchLine.Validate(Quantity, PurchLine.Quantity + ItemJnlLine.Quantity);
                                 PurchLine.Modify();
                             end else begin
@@ -325,14 +339,19 @@ page 50102 "Mercancía Clientes"
                                 Linea += 10000;
                                 PurchLine."Line No." := Linea;
                                 PurchLine."Type" := PurchLine.Type::Item;
-
+                                PurchLine."No Avisar" := true;
                                 PurchLine.Insert(true);
                                 PurchLine.Validate("No.", ItemJnlLine."Item No.");
+                                PurchLine."No Avisar" := true;
                                 PurchLine.Validate(Quantity, ItemJnlLine.Quantity);
                                 PurchLine.Modify();
 
                             end;
                         until ItemJnlLine.Next() = 0;
+                        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+                        PurchLine.SetRange("Document No.", PurchHeader."No.");
+                        PurchLine.SetRange("No.");
+                        PurchLine.ModifyAll("No Avisar", false);
                     end;
                     Commit();
                     Page.Run(pAGE::"Tratamiento Mercancía", PurchHeader);
@@ -375,7 +394,7 @@ page 50102 "Mercancía Clientes"
                             location."Code" := Rec."Bill-to Customer No." + 'U';
                             location."Name" := Rec."Bill-to Customer No." + 'U';
                             location.Insert();
-                            ConfInv.SetRange("Location Code", Rec."Location Code");
+                            ConfInv.SetRange("Location Code", Rec."Bill-to Customer No." + 'R');
                             if ConfInv.FindSet() then
                                 repeat
                                     ConfInvT := ConfInv;

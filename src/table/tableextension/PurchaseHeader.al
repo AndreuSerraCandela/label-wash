@@ -7,7 +7,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
             trigger OnAfterValidate()
             begin
                 if Recepcion = Recepcion::"Recepción" then begin
-                    Validate("Location Code", "Bill-to Customer No.");
+                    Validate("Location Code", "Bill-to Customer No." + 'R');
                 end;
                 if Recepcion = Recepcion::Tratamiento then begin
                     Validate("Location Code", "Bill-to Customer No." + 'T');
@@ -23,7 +23,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
             begin
                 if "Location Code" <> '' Then exit;
                 if Recepcion = Recepcion::"Recepción" then begin
-                    Validate("Location Code", "Bill-to Customer No.");
+                    Validate("Location Code", "Bill-to Customer No." + 'R');
                 end;
                 if Recepcion = Recepcion::Tratamiento then begin
                     Validate("Location Code", "Bill-to Customer No." + 'T');
@@ -63,9 +63,9 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
                 "Payment Terms Code" := Cust."Payment Terms Code";
                 If Cust."Location Code" <> '' then Validate("Location Code", Cust."Location Code");
                 if Cust."Location Code" = '' then begin
-                    If Not Location.Get("Bill-to Customer No.") then
+                    If Not Location.Get("Bill-to Customer No." + 'R') then
                         If Confirm('No se ha definido un almacén para el cliente, desea crear uno?') then begin
-                            Location.Code := "Bill-to Customer No.";
+                            Location.Code := "Bill-to Customer No." + 'R';
                             Location.Name := "Bill-to Name";
                             Location.Insert(true);
                             Validate("Location Code", Location."Code");

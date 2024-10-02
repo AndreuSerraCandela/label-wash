@@ -409,11 +409,11 @@ page 50103 "Uso Mercancía"
                 ItemJnlLine.CopyFromPurchLine(PurchaseLine);
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
                 ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
-                ItemJnlLine."Document No." := PurchaseHeader."No.";
+                ItemJnlLine."Document No." := PurchRcptLine."Document No.";
                 ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
                 ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced";
                 ItemJnlLine."Quantity (Base)" := PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
-                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No.");
+                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'R');
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 if ItemJnlLine.Quantity <> 0 Then

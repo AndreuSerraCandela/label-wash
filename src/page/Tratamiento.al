@@ -407,6 +407,7 @@ page 50104 "Tratamiento Mercancía"
         ConfInv: Record "inventory posting setup";
         ConfInvT: Record "inventory posting setup";
         ConfInvM: Record "inventory posting setup";
+
     begin
 
         PurchRcptHeader.Get(DocumentNo);
@@ -423,11 +424,34 @@ page 50104 "Tratamiento Mercancía"
                 ItemJnlLine.CopyFromPurchLine(PurchaseLine);
                 ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
                 ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
-                ItemJnlLine."Document No." := PurchaseHeader."No.";
+                ItemJnlLine."Document No." := PurchRcptLine."Document No.";
                 ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
-                ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced";
+                ItemJnlLine.Quantity := PurchRcptLine."Qty. Rcd. Not Invoiced" + PurchaseLine."Cantidad a Merma";
                 ItemJnlLine."Quantity (Base)" := PurchRcptLine."Qty. Rcd. Not Invoiced" * PurchaseLine."Qty. per Unit of Measure";
                 ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'U');
+                ItemJnlLine."Invoiced Quantity" := 0;
+                ItemJnlLine."Invoiced Qty. (Base)" := 0;
+                if ItemJnlLine.Quantity <> 0 Then
+                    RunItemJnlPostLine(ItemJnlLine);
+                PurchRcptLine."Qty. Rcd. Not Invoiced" := 0;
+                PurchRcptLine.Modify();
+                ItemJnlLine.Init();
+                PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchRcptLine."Order No.");
+                ItemJnlLine.CopyFromPurchHeader(PurchaseHeader);
+                PurchaseLine.Get(PurchaseHeader."Document Type"::Order, PurchaseHeader."No.", PurchRcptLine."Order Line No.");
+                ItemJnlLine.CopyFromPurchLine(PurchaseLine);
+                ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt.";
+                ItemJnlLine."Item Shpt. Entry No." := 0;//ItemLedgShptEntryNo;
+                ItemJnlLine."Document No." := PurchRcptLine."Document No.";
+                ItemJnlLine."Posting Date" := PurchRcptHeader."Posting Date";
+                ItemJnlLine.Quantity := PurchaseLine."Cantidad a Merma";
+                ItemJnlLine."Quantity (Base)" := PurchaseLine."Cantidad a Merma" * PurchaseLine."Qty. per Unit of Measure";
+                //PurchaseLine."Cantidad Tratada" := PurchaseLine."Cantidad a tratar";
+                //PurchaseLine."Cantidad Tratada Base" := PurchaseLine."Cantidad a tratar Base";
+                PurchaseLine."Cantidad a Merma" := 0;
+                PurchaseLine."Cantidad a Merma Base" := 0;
+                PurchaseLine.Modify();
+                ItemJnlLine.Validate("Location Code", PurchaseHeader."Bill-to Customer No." + 'M');
                 ItemJnlLine."Invoiced Quantity" := 0;
                 ItemJnlLine."Invoiced Qty. (Base)" := 0;
                 if ItemJnlLine.Quantity <> 0 Then
