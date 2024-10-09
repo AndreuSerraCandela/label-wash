@@ -197,6 +197,26 @@ page 50103 "Uso Mercancía"
                 ToolTip = 'View a list of posted purchase receipts for the order.';
             }
         }
+        area(Reporting)
+        {
+            action("Print")
+            {
+                ApplicationArea = All;
+                Caption = 'Imprimir';
+                Promoted = true;
+                PromotedCategory = Report;
+                ToolTip = 'Print';
+                Image = Print;
+                trigger OnAction()
+                var
+                    PurchaseHeader: Record "Purchase Header";
+                begin
+                    PurchaseHeader.SetRange("Document Type", Rec."Document Type");
+                    PurchaseHeader.SetRange("No.", Rec."No.");
+                    Report.RunModal(Report::"Notas Recepcion Servitec", true, true, PurchaseHeader);
+                end;
+            }
+        }
     }
     internal procedure Recibir(PostingCodeunitID: Integer; Navigate: Enum "Navigate After Posting")
     var
