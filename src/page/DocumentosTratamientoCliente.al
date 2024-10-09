@@ -212,7 +212,7 @@ page 50102 "Mercancía Clientes"
 
             }
 
-            action("Envio Para uso desde Cliente")
+            action("Envio Para uso desde Nuevo")
             {
                 ApplicationArea = All;
                 Caption = 'Envio Para uso desde Cliente';
@@ -394,7 +394,7 @@ page 50102 "Mercancía Clientes"
                         PurchLine.SetRange(Quantity);
                         iF PurchLine.FindSet() then
                             repeat
-                                PurchLine.Validate(Quantity);
+                                PurchLine.Validate(Quantity, 0);
                                 PurchLine.Validate("Cantidad a tratar", PurchLine.Quantity);
                                 PurchLine.Modify();
                             until PurchLine.Next() = 0;
@@ -512,9 +512,10 @@ page 50102 "Mercancía Clientes"
         {
             actionref(Edit_Ref; Editar) { }
             actionref(Recepcion_mercancia_Nueva_Ref; "Recepcion mercancia Nueva") { }
-            actionref(Envio_Para_uso_desde_Cliente_Ref; "Envio Para uso desde Cliente") { }
+            actionref(Envio_Para_uso_desde_Cliente_Ref; "Envio Para uso desde Nuevo") { }
             actionref(Recepcion_para_tratar_Ref; "Recepcion para tratar") { }
             actionref(Envio_Para_uso_desde_Tratamiento_Ref; "Envio Para uso desde Tratamiento") { }
+            actionref(Facturar_Tratamiento_Ref; "&Facturar Tratamiento") { }
         }
     }
     var

@@ -343,8 +343,8 @@ page 50104 "Tratamiento Mercancía"
                     SalesLine."Variant Code" := PurchLine."Variant Code";
                 end;
 
-                SalesLine.Validate("Quantity", PurchLine."Cantidad a facturar Tratada");
-                SalesLine."Quantity (Base)" := PurchLine."Cantidad a facturar Tratada" * PurchLine."Qty. per Unit of Measure";
+                SalesLine.Validate("Quantity", PurchLine."Quantity Received" - PurchLine."Cantidad a facturada Tratada");
+                //SalesLine."Quantity (Base)" := PurchLine."Cantidad a facturar Tratada" * PurchLine."Qty. per Unit of Measure";
                 SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
                 SalesLine.vALIDATE("Unit Price", PurchLine."Precio Tratamiento");
                 SalesLine.Description := PurchLine.Description;
