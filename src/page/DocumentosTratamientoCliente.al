@@ -215,7 +215,7 @@ page 50102 "Mercancía Clientes"
             action("Envio Para uso desde Nuevo")
             {
                 ApplicationArea = All;
-                Caption = 'Envio Para uso desde Cliente';
+                Caption = 'Envio Para uso desde Nuevo';
                 Image = WarehouseRegisters;
                 trigger OnAction()
                 var
