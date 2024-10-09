@@ -15,10 +15,39 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 VereificarCantidad("No.", "Cantidad a Tratar", "From-Location Code", "Location Code");
                 Validate("Qty. to Receive", "Cantidad a Tratar" + "Cantidad a Merma");
                 "Cantidad a Tratar Base" := CalcBaseQty("Cantidad a Tratar", FieldCaption("Cantidad a Tratar"), FieldCaption("Cantidad a Tratar Base"));
-
+                "Cantidad a facturar Tratada" := "Cantidad a Tratar" + "Cantidad a Merma";
             end;
 
         }
+        field(50125; "Cantidad a facturada Tratada"; Decimal)
+        {
+            DataClassification = CustomerContent;
+
+
+
+        }
+        field(50126; "Cantidad a facturada Uso"; Decimal)
+        {
+            DataClassification = CustomerContent;
+
+
+
+        }
+        field(50127; "Cantidad a facturar Tratada"; Decimal)
+        {
+            DataClassification = CustomerContent;
+
+
+
+        }
+        field(50128; "Cantidad a facturar Uso"; Decimal)
+        {
+            DataClassification = CustomerContent;
+
+
+
+        }
+
         field(50099; "From-Location Code"; Code[10])
         {
             DataClassification = CustomerContent;
@@ -36,8 +65,24 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             begin
                 VereificarCantidad("No.", "Cantidad a Uso", "From-Location Code", "Location Code");
                 "Cantidad a uso Base" := CalcBaseQty("Cantidad a Uso", FieldCaption("Cantidad a Uso"), FieldCaption("Cantidad a Uso Base"));
+                "Cantidad a facturar Uso" := "Cantidad a Uso";
             end;
 
+        }
+        field(50115; "Cantidad a Merma Uso"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                Validate("Cantidad a Uso", Quantity - "Cantidad Usada" - "Cantidad a Merma Uso");
+                "Cant. a Merma Base Uso" := CalcBaseQty("Cantidad a Merma Uso", FieldCaption("Cantidad a Merma Uso"), FieldCaption("Cant. a Merma Base Uso"));
+
+            end;
+
+        }
+        field(50116; "Cant. a Merma Base Uso"; Decimal)
+        {
+            DataClassification = CustomerContent;
         }
         field(50101; "Cantidad a Tratar Base"; Decimal)
         {
@@ -50,6 +95,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             begin
                 Validate("Cantidad a Tratar", Quantity - "Cantidad Tratada" - "Cantidad a Merma");
                 "Cantidad a Merma Base" := CalcBaseQty("Cantidad a Merma", FieldCaption("Cantidad a Merma"), FieldCaption("Cantidad a Merma Base"));
+                "Cantidad a facturar Tratada" := "Cantidad a Tratar" + "Cantidad a Merma";
 
             end;
 
@@ -161,6 +207,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         PriceCalculation: Interface "Price Calculation";
         PriceType: Enum "Price Type";
         SalesHeader: Record "Sales Header";
+        "From-LocationCode": Code[10];
         SalesLine: Record "Sales Line";
 
     procedure GetPriceCalculationHandler(PriceType: Enum "Price Type"; PurchHeader: Record "Purchase Header"; var PriceCalculation: Interface "Price Calculation")
@@ -235,7 +282,9 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
     var
         ItemLegderEntry: Record "Item Ledger Entry";
         AlmacenUso: Code[20];
+
     begin
+        if FromCode = '' then FromCode := "From-LocationCode";
 
         AlmacenUso := FromCode;
         ItemLegderEntry.SetCurrentKey("Item No.", Positive, "Location Code");
@@ -243,9 +292,16 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
         ItemLegderEntry.SetRange("Location Code", AlmacenUso);
         If ItemLegderEntry.FindSet() then begin
             ItemLegderEntry.CalcSums("Quantity");
+            if ItemLegderEntry.Quantity < 0 Then exit;
             if ItemLegderEntry.Quantity < pQuantity then
                 Error('La cantidad a tratar es mayor a la cantidad en almacen %1', AlmacenUso);
         end else
-            Error('No se encontro el producto en almacen %1', AlmacenUso);
+            if pQuantity <> 0 then
+                Error('No se encontro el producto en almacen %1', AlmacenUso);
+    end;
+
+    procedure formlocationcode(fLocationCode: Code[10])
+    begin
+        "From-LocationCode" := fLocationCode;
     end;
 }

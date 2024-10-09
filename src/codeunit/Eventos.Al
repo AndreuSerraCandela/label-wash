@@ -34,7 +34,47 @@ codeunit 50100 EventosTratamientos
             PurchaseLine.Modify();
 
         end;
+        If PurchaseHeader.Recepcion = Recepcion::Uso then begin
+            PurchaseLine."Qty. to Receive" := PurchaseLine."Cantidad a Uso";
+            PurchaseLine."Qty. to Receive (Base)" := PurchaseLine."Cantidad a Uso Base";
+            PurchaseLine.Modify();
+        end;
 
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
+    local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]; CommitIsSuppressed: Boolean; InvtPickPutaway: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry"; WhseShip: Boolean; WhseReceiv: Boolean; PreviewMode: Boolean)
+    var
+        PurchaseLine: Record "Purchase Line";
+        PurchaseHeader: Record "Purchase Header";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        If SalesInvHdrNo = '' then
+            exit;
+        SalesInvoiceLine.SetRange("Document No.", SalesInvHdrNo);
+        If SalesInvoiceLine.FindFirst() Then
+            repeat
+                PurchaseLine.SetRange("Document No.", SalesInvoiceLine."Pedido Compra");
+                PurchaseLine.SetRange("Line No.", SalesInvoiceLine."Linea Pedido Compra");
+                If PurchaseLine.FindFirst() Then begin
+                    PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+                    case PurchaseHeader.Recepcion Of
+                        Recepcion::Tratamiento:
+                            begin
+                                PurchaseLine."Cantidad a facturar Tratada" := 0;
+                                PurchaseLine."Cantidad a facturada Tratada" += SalesInvoiceLine."Quantity";
+                                PurchaseLine.Modify();
+                            end;
+                        Recepcion::Uso:
+                            begin
+                                PurchaseLine."Cantidad a facturar Uso" := 0;
+                                PurchaseLine."Cantidad a facturada Uso" += SalesInvoiceLine."Quantity";
+                                PurchaseLine.Modify();
+                            end;
+                    end;
+
+                end;
+            until SalesInvoiceLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterPostPurchaseDoc', '', false, false)]
@@ -60,6 +100,7 @@ codeunit 50100 EventosTratamientos
                     PurchaseLine."Cantidad Tratada Base" := PurchaseLine."Cantidad a tratar Base";
                     PurchaseLine."Cantidad a Tratar" := PurchaseLine."Qty. to Receive";
                     PurchaseLine."Cantidad a Tratar Base" := PurchaseLine."Qty. to Receive (Base)";
+                    PurchaseLine."Cantidad a facturar Tratada" := PurchaseLine."Cantidad a tratar" + PurchaseLine."Cantidad a Merma";
                     //PurchaseLine."Cantidad a Merma" := 0;
                     //PurchaseLine."Cantidad a Merma Base" := 0;
                     PurchaseLine.Modify();
@@ -69,10 +110,18 @@ codeunit 50100 EventosTratamientos
         if PurchaseHeader.Recepcion = Recepcion::Uso then begin
             if PurchaseLine.FindSet() then
                 repeat
+                    PurchaseLine."Quantity Received" := PurchaseLine."Cantidad a Tratar" + PurchaseLine."Cantidad a Merma Uso";
+                    PurchaseLine."Qty. Received (Base)" := PurchaseLine."Quantity Received" * PurchaseLine."Qty. per Unit of Measure";
+                    PurchaseLine."Qty. Rcd. Not Invoiced" := PurchaseLine."Quantity Received";
+                    PurchaseLine."Qty. Rcd. Not Invoiced (Base)" := PurchaseLine."Qty. Received (Base)";
+
+                    PurchaseLine."Qty. to Receive" := PurchaseLine.Quantity - PurchaseLine."Quantity Received";
+                    PurchaseLine."Qty. to Receive (Base)" := PurchaseLine."Quantity (Base)" - PurchaseLine."Qty. Received (Base)";
                     PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad a uso";
                     PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad a uso Base";
                     PurchaseLine."Cantidad a Uso" := PurchaseLine."Qty. to Receive";
                     PurchaseLine."Cantidad a uso Base" := PurchaseLine."Qty. to Receive (Base)";
+                    PurchaseLine."Cantidad a facturar Uso" := PurchaseLine."Cantidad a uso";
                     PurchaseLine.Modify();
                 until PurchaseLine.Next() = 0;
         end;

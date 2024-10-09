@@ -399,6 +399,8 @@ page 50100 "Recepción Mercancía"
                 SalesLine."Document Type" := SalesHeader."Document Type";
                 SalesLine."Document No." := SalesHeader."No.";
                 SalesLine."Line No." := PurchLine."Line No.";
+                SalesLine."Pedido Compra" := PurchLine."Document No.";
+                SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
                 iF PurchLine.Type = PurchLine.TYPE::Item then begin
                     SalesLine.Type := SalesLine.TYPE::"G/L Account";
                     ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
@@ -410,12 +412,8 @@ page 50100 "Recepción Mercancía"
                     SalesLine."Variant Code" := PurchLine."Variant Code";
                 end;
 
-                SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
-                PurchLine."Quantity Invoiced" += PurchLine."Qty. Rcd. Not Invoiced";
-                PurchLine."Qty. Rcd. Not Invoiced" := 0;
-                SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
-                PurchLine."Qty. Invoiced (Base)" += PurchLine."Qty. Rcd. Not Invoiced (Base)";
-                PurchLine."Qty. Rcd. Not Invoiced (Base)" := 0;
+                SalesLine."Quantity" := PurchLine."Cantidad a facturada Uso";
+                SalesLine."Quantity (Base)" := PurchLine."Cantidad a facturar Uso" * PurchLine."Qty. per Unit of Measure";
                 SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
                 SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
                 SalesLine.Description := PurchLine.Description;

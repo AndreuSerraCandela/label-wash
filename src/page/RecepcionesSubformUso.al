@@ -217,34 +217,45 @@ page 50147 "Subform Uso"
 
 
 
-                // field("Cantidad a Usar"; Rec."Cantidad a Tratar")
-                // {
-                //     ApplicationArea = Suite;
-                //     BlankZero = true;
+                field("Cantidad a Usar"; Rec."Cantidad a Tratar")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
 
 
-                //     trigger OnValidate()
-                //     begin
-                //         SetItemChargeFieldsStyle();
-                //     end;
-                // }
-                // field("Cantidad Usada"; Rec."Cantidad Tratada")
-                // {
-                //     ApplicationArea = Suite;
-                //     BlankZero = true;
-                //     ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+                    trigger OnValidate()
+                    begin
+                        SetItemChargeFieldsStyle();
+                    end;
+                }
+                field("Cantidad Usada"; Rec."Cantidad Tratada")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
 
-                //     // trigger OnDrillDown()
-                //     // var
-                //     //     PurchInvLine: Record "Purch. Inv. Line";
-                //     // begin
-                //     //     PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
-                //     //     PurchInvLine.SetRange("Order No.", Rec."Document No.");
-                //     //     PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
-                //     //     PurchInvLine.SetFilter(Quantity, '<>%1', 0);
-                //     //     PAGE.RunModal(0, PurchInvLine);
-                //     // end;
-                // }
+                    // trigger OnDrillDown()
+                    // var
+                    //     PurchInvLine: Record "Purch. Inv. Line";
+                    // begin
+                    //     PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
+                    //     PurchInvLine.SetRange("Order No.", Rec."Document No.");
+                    //     PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
+                    //     PurchInvLine.SetFilter(Quantity, '<>%1', 0);
+                    //     PAGE.RunModal(0, PurchInvLine);
+                    // end;
+                }
+                field("Cantidad a Merma"; Rec."Cantidad a Merma Uso")
+                {
+                    ApplicationArea = Suite;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of the item that is lost or wasted during the production process. The quantity is based on the unit chosen in the Unit of Measure Code field.';
+
+                    trigger OnValidate()
+                    begin
+                        SetItemChargeFieldsStyle();
+                    end;
+                }
                 field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;

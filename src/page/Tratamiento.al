@@ -197,6 +197,26 @@ page 50104 "Tratamiento Mercancía"
                     Facturar();
                 end;
             }
+            action("&Forzar Facturar")
+            {
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Process;
+                ToolTip = 'Fuerza cantidad a facturar, para puebas';
+                Image = Invoice;
+                trigger OnAction()
+                var
+                    PurchaseLine: Record "Purchase Line";
+                begin
+                    PurchaseLine.SetRange("Document No.", Rec."No.");
+                    PurchaseLine.SetRange("Document Type", Rec."Document Type");
+                    If PurchaseLine.FindSet() then
+                        repeat
+                            PurchaseLine."Cantidad a facturar Tratada" := (PurchaseLine."Cantidad tratada" + (PurchaseLine.Quantity - PurchaseLine."Cantidad tratada")) - PurchaseLine."Cantidad a facturada Tratada";
+                            PurchaseLine.Modify();
+                        until PurchaseLine.Next() = 0;
+                end;
+            }
 
         }
         area(Navigation)
@@ -310,22 +330,26 @@ page 50104 "Tratamiento Mercancía"
                 SalesLine."Document Type" := SalesHeader."Document Type";
                 SalesLine."Document No." := SalesHeader."No.";
                 SalesLine."Line No." := PurchLine."Line No.";
+                SalesLine."Pedido Compra" := PurchLine."Document No.";
+                SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
                 iF PurchLine.Type = PurchLine.TYPE::Item then begin
                     SalesLine.Type := SalesLine.TYPE::"G/L Account";
                     ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
                     ConfGrupos.TestField("Sales Account");
-                    SalesLine."No." := ConfGrupos."Sales Account";
+                    SalesLine.Validate("No.", ConfGrupos."Sales Account");
                 end else begin
                     SalesLine."Type" := PurchLine."Type";
-                    SalesLine."No." := PurchLine."No.";
+                    SalesLine.Validate("No.", PurchLine."No.");
                     SalesLine."Variant Code" := PurchLine."Variant Code";
                 end;
 
-                SalesLine."Quantity" := PurchLine."Cantidad a Tratar";
-                SalesLine."Quantity (Base)" := PurchLine."Cantidad a Tratar Base";
+                SalesLine.Validate("Quantity", PurchLine."Cantidad a facturar Tratada");
+                SalesLine."Quantity (Base)" := PurchLine."Cantidad a facturar Tratada" * PurchLine."Qty. per Unit of Measure";
                 SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
-                SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+                SalesLine.vALIDATE("Unit Price", PurchLine."Precio Tratamiento");
                 SalesLine.Description := PurchLine.Description;
+                SalesLine."Pedido Compra" := PurchLine."Document No.";
+                SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
                 SalesLine.Insert(true);
             until PurchLine.Next() = 0;
         Commit();
