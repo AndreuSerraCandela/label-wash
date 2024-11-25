@@ -201,7 +201,7 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(No_SalesInvoiceHeader1
-                ; "Sales Invoice Header"."No.")
+                ; "Sales Invoice Header"."Bill-to Name")
                     { }
 
                     column(ReferenceText
@@ -985,6 +985,7 @@ Report 50100 "Notas Recepcion Servitec"
             trigger OnAfterGetRecord()
             var
                 SalesInvoice: Record "Sales Invoice Header" temporary;
+                ShipCustAdr: Record "Ship-to Address";
             BEGIN
                 If "Language Code" = '' Then "Language Code" := 'ESP';
                 CurrReport.LANGUAGE := Language.GetLanguageID("Language Code");
@@ -1020,17 +1021,39 @@ Report 50100 "Notas Recepcion Servitec"
                     TotalInclVATText := STRSUBSTNO(Text1100000, "Currency Code");
                     TotalExclVATText := STRSUBSTNO(Text1100001, "Currency Code");
                 END;
-                SalesInvoice."Bill-to Customer No." := "Sales Invoice Header"."Bill-to Customer No.";
-                SalesInvoice."Bill-to Address" := "Sales Invoice Header"."Bill-to Address";
-                SalesInvoice."Bill-to Contact No." := "Sales Invoice Header"."Bill-to Contact No.";
-                SalesInvoice."Bill-to Name" := "Sales Invoice Header"."Bill-to Name";
-                SalesInvoice."Bill-to Name 2" := "Sales Invoice Header"."Bill-to Name 2";
-                SalesInvoice."Bill-to Post Code" := "Sales Invoice Header"."Bill-to Post Code";
-                SalesInvoice."Bill-to City" := "Sales Invoice Header"."Bill-to City";
-                SalesInvoice."Bill-to County" := "Sales Invoice Header"."Bill-to County";
-                SalesInvoice."Bill-to Country/Region Code" := "Sales Invoice Header"."Bill-to Country/Region Code";
+                // SalesInvoice."Bill-to Customer No." := "Sales Invoice Header"."Bill-to Customer No.";
+                // SalesInvoice."Bill-to Address" := "Sales Invoice Header"."Bill-to Address";
+                // SalesInvoice."Bill-to Contact No." := "Sales Invoice Header"."Bill-to Contact No.";
+                // SalesInvoice."Bill-to Name" := "Sales Invoice Header"."Bill-to Name";
+                // SalesInvoice."Bill-to Name 2" := "Sales Invoice Header"."Bill-to Name 2";
+                // SalesInvoice."Bill-to Post Code" := "Sales Invoice Header"."Bill-to Post Code";
+                // SalesInvoice."Bill-to City" := "Sales Invoice Header"."Bill-to City";
+                // SalesInvoice."Bill-to County" := "Sales Invoice Header"."Bill-to County";
+                // SalesInvoice."Bill-to Country/Region Code" := "Sales Invoice Header"."Bill-to Country/Region Code";
                 IF NOT Cust.GET("Bill-to Customer No.") THEN
                     CLEAR(Cust);
+                if ShipCustAdr.GET("Bill-to Customer No.", cUST."Ship-to Code") THEN begin
+                    iF ShipCustAdr.Name <> '' THEN
+                        Cust."Name" := ShipCustAdr.Name;
+                    IF ShipCustAdr."Name 2" <> '' THEN
+                        Cust."Name 2" := ShipCustAdr."Name 2";
+                    IF ShipCustAdr.Address <> '' THEN
+                        Cust.Address := ShipCustAdr.Address;
+                    IF ShipCustAdr."Address 2" <> '' THEN
+                        Cust."Address 2" := ShipCustAdr."Address 2";
+                    IF ShipCustAdr.City <> '' THEN
+                        Cust.City := ShipCustAdr.City;
+                    IF ShipCustAdr.County <> '' THEN
+                        Cust.County := ShipCustAdr.County;
+                    IF ShipCustAdr."Post Code" <> '' THEN
+                        Cust."Post Code" := ShipCustAdr."Post Code";
+                    IF ShipCustAdr."Country/Region Code" <> '' THEN
+                        Cust."Country/Region Code" := ShipCustAdr."Country/Region Code";
+                    IF ShipCustAdr."Phone No." <> '' THEN
+                        Cust."Phone No." := ShipCustAdr."Phone No.";
+                end;
+
+
                 If Salesinvoice."Bill-to Name" = '' THEN
                     SalesInvoice."Bill-to Name" := Cust.Name;
                 IF Salesinvoice."Bill-to Name 2" = '' THEN
@@ -1046,18 +1069,17 @@ Report 50100 "Notas Recepcion Servitec"
                 If SalesInvoice."Bill-to Address" = '' THEN
                     SalesInvoice."Bill-to Address" := Cust.Address;
                 If SalesInvoice."Bill-to Address 2" = '' THEN
-                    SalesInvoice."Bill-to Address" := Cust."Address 2";
+                    SalesInvoice."Bill-to Address 2" := Cust."Address 2";
 
                 SalesInvoice."Sell-to Customer No." := SalesInvoice."Bill-to Customer No.";
                 SalesInvoice."sell-to Address" := SalesInvoice."Bill-to Address";
-                SalesInvoice."sell-to Contact No." := SalesInvoice."Bill-to Contact No.";
                 SalesInvoice."Sell-to Customer Name" := SalesInvoice."Bill-to Name";
                 SalesInvoice."Sell-to Customer Name 2" := SalesInvoice."Bill-to Name 2";
                 SalesInvoice."Sell-to Post Code" := SalesInvoice."Bill-to Post Code";
                 SalesInvoice."Sell-to City" := SalesInvoice."Bill-to City";
                 SalesInvoice."Sell-to County" := SalesInvoice."Bill-to County";
                 SalesInvoice."Sell-to Country/Region Code" := SalesInvoice."Bill-to Country/Region Code";
-
+                SalesInvoice."VAT Registration No." := Cust."VAT Registration No.";
                 FormatAddr.SalesInvBillTo(CustAddr, SalesInvoice);
                 IF NOT Cust.GET("Bill-to Customer No.") THEN
                     CLEAR(Cust);

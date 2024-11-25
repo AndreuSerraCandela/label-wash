@@ -1224,6 +1224,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
             <PageBreak>
               <BreakLocation>End</BreakLocation>
             </PageBreak>
+            <Top>0cm</Top>
             <Left>0.04369cm</Left>
             <Height>2.9986cm</Height>
             <Width>17.67272cm</Width>
@@ -1238,7 +1239,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
       <Width>17.71641cm</Width>
       <Page>
         <PageHeader>
-          <Height>11.19576cm</Height>
+          <Height>8.82332cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -1301,7 +1302,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(37,1)</Value>
+                      <Value>Cliente</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1313,8 +1314,8 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>226.73496pt</Top>
-              <Left>0.04369cm</Left>
+              <Top>219.86013pt</Top>
+              <Left>0.0437cm</Left>
               <Height>10pt</Height>
               <Width>3.1937cm</Width>
               <ZIndex>3</ZIndex>
@@ -1368,8 +1369,8 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>226.73496pt</Top>
-              <Left>3.41378cm</Left>
+              <Top>219.86013pt</Top>
+              <Left>3.41379cm</Left>
               <Height>10pt</Height>
               <Width>5.4451cm</Width>
               <ZIndex>5</ZIndex>
@@ -1422,7 +1423,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>217.73514pt</Top>
+              <Top>213.98514pt</Top>
               <Left>9.52626cm</Left>
               <Height>10pt</Height>
               <Width>7.48967cm</Width>
@@ -1448,8 +1449,8 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>204.48514pt</Top>
-              <Left>9.52626cm</Left>
+              <Top>198.98514pt</Top>
+              <Left>9.50805cm</Left>
               <Height>10pt</Height>
               <Width>7.48967cm</Width>
               <ZIndex>8</ZIndex>
@@ -1474,8 +1475,8 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>191.23514pt</Top>
-              <Left>9.52626cm</Left>
+              <Top>184.98514pt</Top>
+              <Left>9.50805cm</Left>
               <Height>10pt</Height>
               <Width>7.48967cm</Width>
               <ZIndex>9</ZIndex>
@@ -1501,8 +1502,8 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>177.98514pt</Top>
-              <Left>270.0356pt</Left>
+              <Top>169.98514pt</Top>
+              <Left>269.51924pt</Left>
               <Height>10pt</Height>
               <Width>7.48968cm</Width>
               <ZIndex>10</ZIndex>
@@ -1529,67 +1530,12 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>194.73496pt</Top>
+              <Top>191.23514pt</Top>
               <Left>0.08738cm</Left>
               <Height>20pt</Height>
               <Width>8.7715cm</Width>
               <ZIndex>11</ZIndex>
               <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="SalesInvoiceHeaderDueDateCaption">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(50,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>279.33493pt</Top>
-              <Left>0.08738cm</Left>
-              <Height>10.99994pt</Height>
-              <Width>3.15cm</Width>
-              <ZIndex>12</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="SalesInvoiceHeaderDueDate">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(26,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>279.33493pt</Top>
-              <Left>3.41377cm</Left>
-              <Height>10.99994pt</Height>
-              <Width>5.44511cm</Width>
-              <ZIndex>13</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
@@ -1611,7 +1557,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>100.23853pt</Left>
               <Height>0.75pt</Height>
               <Width>1.68623cm</Width>
-              <ZIndex>14</ZIndex>
+              <ZIndex>12</ZIndex>
               <Visibility>
                 <Hidden>=Code.SetData(ReportItems!CustAddr.Value,1)</Hidden>
               </Visibility>
@@ -1619,112 +1565,6 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Style>
                 <PaddingLeft>2pt</PaddingLeft>
                 <PaddingRight>2pt</PaddingRight>
-              </Style>
-            </Textbox>
-            <Textbox Name="PaymentTermsDescriptionCaption1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(52,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>PaymentTermsDescriptionCaption_1</rd:DefaultName>
-              <Top>266.23485pt</Top>
-              <Left>2.47691pt</Left>
-              <Height>0.13889in</Height>
-              <Width>1.24016in</Width>
-              <ZIndex>15</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PaymentTermsDescription1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(31,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>PaymentTermsDescription_1</rd:DefaultName>
-              <Top>266.8599pt</Top>
-              <Left>1.344in</Left>
-              <Height>0.13889in</Height>
-              <Width>2.14375in</Width>
-              <ZIndex>16</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PaymentMethodDescCaption1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(53,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>253.48487pt</Top>
-              <Left>0.08738cm</Left>
-              <Height>0.13889in</Height>
-              <Width>1.24016in</Width>
-              <ZIndex>17</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PaymentMethodDesc1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(32,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>253.48487pt</Top>
-              <Left>1.34401in</Left>
-              <Height>0.13889in</Height>
-              <Width>2.14374in</Width>
-              <ZIndex>18</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
             <Textbox Name="SalesInvoiceHeaderVATRegistrationNo1">
@@ -1748,7 +1588,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>10.96522cm</Left>
               <Height>10pt</Height>
               <Width>6.05071cm</Width>
-              <ZIndex>19</ZIndex>
+              <ZIndex>13</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1774,7 +1614,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>9.52626cm</Left>
               <Height>10pt</Height>
               <Width>1.26258cm</Width>
-              <ZIndex>20</ZIndex>
+              <ZIndex>14</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1803,7 +1643,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>0.08738cm</Left>
               <Height>0.35278cm</Height>
               <Width>6.65444cm</Width>
-              <ZIndex>21</ZIndex>
+              <ZIndex>15</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1831,7 +1671,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>0.08738cm</Left>
               <Height>0.35278cm</Height>
               <Width>6.65444cm</Width>
-              <ZIndex>22</ZIndex>
+              <ZIndex>16</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1859,7 +1699,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>0.08738cm</Left>
               <Height>0.35278cm</Height>
               <Width>6.65444cm</Width>
-              <ZIndex>23</ZIndex>
+              <ZIndex>17</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1887,7 +1727,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
               <Left>0.08738cm</Left>
               <Height>0.35278cm</Height>
               <Width>6.65444cm</Width>
-              <ZIndex>24</ZIndex>
+              <ZIndex>18</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1909,11 +1749,11 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>240.10991pt</Top>
-              <Left>3.41378cm</Left>
+              <Top>236.7349pt</Top>
+              <Left>3.41379cm</Left>
               <Height>10pt</Height>
               <Width>5.4451cm</Width>
-              <ZIndex>25</ZIndex>
+              <ZIndex>19</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1924,7 +1764,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(38,1)</Value>
+                      <Value>Fecha Envio</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1935,72 +1775,13 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>240.10991pt</Top>
-              <Left>0.08738cm</Left>
+              <Top>236.10986pt</Top>
+              <Left>0.08739cm</Left>
               <Height>10pt</Height>
               <Width>3.15cm</Width>
-              <ZIndex>26</ZIndex>
+              <ZIndex>20</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="ExternalDocumentNo">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(56,1)</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>ExternalDocumentNo</rd:DefaultName>
-              <Top>10.35173cm</Top>
-              <Left>3.41379cm</Left>
-              <Height>0.36601cm</Height>
-              <Width>5.44509cm</Width>
-              <ZIndex>27</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox11">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=First(Fields!NoDocExtLblCaption.Value, "DataSet_Result")</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox11</rd:DefaultName>
-              <Top>10.35173cm</Top>
-              <Left>0.08738cm</Left>
-              <Height>0.36601cm</Height>
-              <Width>3.15cm</Width>
-              <ZIndex>28</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
               </Style>
             </Textbox>
           </ReportItems>
@@ -2127,7 +1908,7 @@ Cstr(Fields!ExternalDocumentNo.Value)</Value>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>8.75pt</Top>
+              <Top>8.74985pt</Top>
               <Left>1.14407cm</Left>
               <Height>106.24997pt</Height>
               <Width>8.7715cm</Width>
