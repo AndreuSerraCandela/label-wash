@@ -499,11 +499,36 @@ page 50102 "Mercancía Clientes"
             {
                 ApplicationArea = All;
                 Caption = 'Facturar';
-                ToolTip = 'Facturar Recepcion';
+                ToolTip = 'Facturar Recepcion Cliente';
                 Image = Invoice;
                 trigger OnAction()
                 begin
-                    Facturar();
+                    Facturar(Rec, true);
+                end;
+            }
+            action("&Facturar Tratamiento Clientes")
+            {
+                ApplicationArea = All;
+                Caption = 'Facturar';
+                ToolTip = 'Facturar Recepcion Clientes';
+                Image = "Invoicing-Document";
+                trigger OnAction()
+                var
+                    PurchHeader: Record "Purchase Header";
+                    Custos: Record "Customer" temporary;
+                begin
+                    CurrPage.SetSelectionFilter(PurchHeader);
+                    If PurchHeader.Count = 1 then
+                        if not Confirm('Solo ha seleccionado una recepción,¿Desea facturar la recepción seleccionada?', true) then
+                            exit;
+                    If PurchHeader.FindSet() then
+                        repeat
+                            if not Custos.Get(PurchHeader."Bill-to Customer No.") then
+                                Facturar(PurchHeader, false);
+                            Custos.Init();
+                            Custos."No." := PurchHeader."Bill-to Customer No.";
+                            if Custos.Insert() then;
+                        until PurchHeader.Next() = 0;
                 end;
             }
         }
@@ -571,7 +596,7 @@ page 50102 "Mercancía Clientes"
     // begin
     //     ItemJnlPostLine.RunWithCheck(ItemJnlLineToPost);
     // end;
-    local procedure Facturar()
+    local procedure Facturar(var Purch: Record "Purchase Header"; Mostrar: Boolean)
     var
         PurchLine: Record "Purchase Line";
         PurchHeader: Record "Purchase Header";
@@ -587,14 +612,14 @@ page 50102 "Mercancía Clientes"
         Fecha := Fechas.GetDate();
         SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
-        SalesHeader."Bill-to Customer No." := Rec."Bill-to Customer No.";
+        SalesHeader."Bill-to Customer No." := Purch."Bill-to Customer No.";
         SalesHeader."Order Date" := WorkDate();
         SalesHeader.Validate("Order Date", WorkDate());
         SalesHeader.Insert(true);
-        SalesHeader.Validate("Sell-to Customer No.", Rec."Bill-to Customer No.");
+        SalesHeader.Validate("Sell-to Customer No.", Purch."Bill-to Customer No.");
         SalesHeader.Modify(true);
         PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
-        PurchHeader.SetRange("Bill-to Customer No.", Rec."Bill-to Customer No.");
+        PurchHeader.SetRange("Bill-to Customer No.", Purch."Bill-to Customer No.");
         PurchHeader.SetRange(Recepcion, PurchHeader.Recepcion::Tratamiento);
         PurchHeader.SetRange("Order Date", 0D, Fecha);
         If PurchHeader.FindFirst() Then
@@ -632,7 +657,8 @@ page 50102 "Mercancía Clientes"
                     until PurchLine.Next() = 0;
             until PurchHeader.Next() = 0;
         Commit();
-        Page.Runmodal(0, SalesHeader);
+        if Mostrar then
+            Page.Runmodal(0, SalesHeader);
     end;
 
 
