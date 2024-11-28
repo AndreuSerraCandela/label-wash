@@ -31,6 +31,10 @@ tableextension 50116 SalesInvLineExt extends "Sales Invoice Line"
             Caption = 'Linea Pedido Compra';
             DataClassification = ToBeClassified;
         }
+        // modify("Unit Volume")
+        // {
+        //     DecimalPalces= 3:3;
+        // }
     }
 
 }

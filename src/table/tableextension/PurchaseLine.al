@@ -2,7 +2,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
 {
     fields
     {
-        field(50100; "Cantidad a Tratar"; Decimal)
+        field(50200; "Cantidad a Tratar"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -19,28 +19,28 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             end;
 
         }
-        field(50125; "Cantidad a facturada Tratada"; Decimal)
+        field(50225; "Cantidad a facturada Tratada"; Decimal)
         {
             DataClassification = CustomerContent;
 
 
 
         }
-        field(50126; "Cantidad a facturada Uso"; Decimal)
+        field(50226; "Cantidad a facturada Uso"; Decimal)
         {
             DataClassification = CustomerContent;
 
 
 
         }
-        field(50127; "Cantidad a facturar Tratada"; Decimal)
+        field(50227; "Cantidad a facturar Tratada"; Decimal)
         {
             DataClassification = CustomerContent;
 
 
 
         }
-        field(50128; "Cantidad a facturar Uso"; Decimal)
+        field(50228; "Cantidad a facturar Uso"; Decimal)
         {
             DataClassification = CustomerContent;
 
@@ -48,17 +48,17 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
 
         }
 
-        field(50099; "From-Location Code"; Code[10])
+        field(50199; "From-Location Code"; Code[10])
         {
             DataClassification = CustomerContent;
             TableRelation = "Location";
             Caption = 'Almacen origen';
         }
-        field(50108; "Cantidad a uso Base"; Decimal)
+        field(50208; "Cantidad a uso Base"; Decimal)
         {
             DataClassification = CustomerContent;
         }
-        field(50109; "Cantidad a Uso"; Decimal)
+        field(50209; "Cantidad a Uso"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -69,7 +69,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             end;
 
         }
-        field(50115; "Cantidad a Merma Uso"; Decimal)
+        field(50215; "Cantidad a Merma Uso"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -80,15 +80,15 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             end;
 
         }
-        field(50116; "Cant. a Merma Base Uso"; Decimal)
+        field(50216; "Cant. a Merma Base Uso"; Decimal)
         {
             DataClassification = CustomerContent;
         }
-        field(50101; "Cantidad a Tratar Base"; Decimal)
+        field(50201; "Cantidad a Tratar Base"; Decimal)
         {
             DataClassification = CustomerContent;
         }
-        field(50105; "Cantidad a Merma"; Decimal)
+        field(50205; "Cantidad a Merma"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -100,12 +100,12 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
             end;
 
         }
-        field(50106; "Cantidad a Merma Base"; Decimal)
+        field(50206; "Cantidad a Merma Base"; Decimal)
         {
             DataClassification = CustomerContent;
         }
 
-        field(50102; "Cantidad Tratada"; Decimal)
+        field(50202; "Cantidad Tratada"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -113,11 +113,11 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 "Cantidad Tratada Base" := CalcBaseQty("Cantidad Tratada", FieldCaption("Cantidad Tratada"), FieldCaption("Cantidad Tratada Base"));
             end;
         }
-        field(50110; "Cantidad Usada Base"; Decimal)
+        field(50210; "Cantidad Usada Base"; Decimal)
         {
             DataClassification = CustomerContent;
         }
-        field(50111; "Cantidad Usada"; Decimal)
+        field(50211; "Cantidad Usada"; Decimal)
         {
             DataClassification = CustomerContent;
             trigger OnValidate()
@@ -125,21 +125,23 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 "Cantidad Usada Base" := CalcBaseQty("Cantidad Usada", FieldCaption("Cantidad Usada"), FieldCaption("Cantidad Usada Base"));
             end;
         }
-        field(50103; "Cantidad Tratada Base"; Decimal)
+        field(50203; "Cantidad Tratada Base"; Decimal)
         {
             DataClassification = CustomerContent;
         }
-        field(50104; "Precio X Producto"; DECIMAL)
+        field(50204; "Precio X Producto"; DECIMAL)
         {
             DataClassification = CustomerContent;
+            DecimalPlaces = 3 : 3;
             trigger OnValidate()
             begin
                 validate("Direct unit cost", "Precio X Producto");
 
             end;
         }
-        field(50107; "Precio Tratamiento"; DECIMAL)
+        field(50207; "Precio Tratamiento"; DECIMAL)
         {
+            DecimalPlaces = 3 : 3;
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
@@ -195,7 +197,7 @@ tableextension 50105 PurchaseLineExtension extends "Purchase Line"
                 end;
             end;
         }
-        field(50112; "No Avisar"; Boolean)
+        field(50212; "No Avisar"; Boolean)
         {
             ObsoleteReason = 'No se usa';
             ObsoleteState = Removed;
