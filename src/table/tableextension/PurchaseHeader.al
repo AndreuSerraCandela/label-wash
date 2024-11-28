@@ -266,6 +266,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header"
         }
     }
 
+
     local procedure GetCust(BilltoCustomerNo: Code[20])
     begin
         Cust.Get(BilltoCustomerNo);

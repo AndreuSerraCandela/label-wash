@@ -63,16 +63,16 @@
                               <TablixBody>
                                 <TablixColumns>
                                   <TablixColumn>
-                                    <Width>2.32397cm</Width>
+                                    <Width>0.92165cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>12.47005cm</Width>
+                                    <Width>14.0972cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>1.79021cm</Width>
+                                    <Width>1.75645cm</Width>
                                   </TablixColumn>
                                   <TablixColumn>
-                                    <Width>0.34432cm</Width>
+                                    <Width>0.31056cm</Width>
                                   </TablixColumn>
                                 </TablixColumns>
                                 <TablixRows>
@@ -1054,9 +1054,9 @@
                                   </FilterValues>
                                 </Filter>
                               </Filters>
-                              <Left>0.04369cm</Left>
+                              <Left>0.17873cm</Left>
                               <Height>2.9986cm</Height>
-                              <Width>16.92855cm</Width>
+                              <Width>17.08586cm</Width>
                               <ZIndex>1</ZIndex>
                               <Style />
                             </Tablix>
@@ -1079,7 +1079,8 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Cstr(Fields!CustAddr1.Value) + Chr(177) + 
+                                                    <Value>=
+Cstr(Fields!CustAddr1.Value) + Chr(177) + 
 Cstr(Fields!CustAddr2.Value) + Chr(177) + 
 Cstr(Fields!CustAddr3.Value) + Chr(177) + 
 Cstr(Fields!CustAddr4.Value) + Chr(177) + 
@@ -1134,14 +1135,7 @@ Cstr(Fields!PmtTermsDescCaption.Value) + Chr(177) +
 Cstr(Fields!PmtMethodDescCaption.Value) + Chr(177) + 
 Cstr(Fields!HomePageCaption.Value) + Chr(177) + 
 Cstr(Fields!EmailCaption.Value)  + Chr(177) + 
-Cstr(Fields!ExternalDocumentNo.Value) + Chr(177) + 
-Cstr(Fields!ShpCaption.value)+ Chr(177) + 
-Cstr(Fields!SelltoCustNo_SalesInvHdr.value)+ Chr(177) + 
-Cstr(Fields!CompShip1.Value)+ Chr(177) + 
-Cstr(Fields!CompShip2.Value)+ Chr(177) + 
-Cstr(Fields!CompShip3.Value)+ Chr(177) + 
-Cstr(Fields!NoAlbaran.Value) + Chr(177) +
-Cstr(Fields!ShpCaptionLbl2.value)</Value>
+Cstr(Fields!ExternalDocumentNo.Value)</Value>
                                                     <Style>
                                                       <FontStyle>Normal</FontStyle>
                                                       <FontFamily>Segoe UI</FontFamily>
@@ -1158,14 +1152,10 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                                               <Hidden>true</Hidden>
                                             </Visibility>
                                             <Style>
-                                              <Border>
-                                                <Style>None</Style>
-                                              </Border>
                                               <VerticalAlign>Middle</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
                                           </Textbox>
-                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                     </TablixCells>
@@ -1234,6 +1224,7 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
             <PageBreak>
               <BreakLocation>End</BreakLocation>
             </PageBreak>
+            <Top>0cm</Top>
             <Left>0.04369cm</Left>
             <Height>2.9986cm</Height>
             <Width>17.67272cm</Width>
@@ -1248,7 +1239,7 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
       <Width>17.71641cm</Width>
       <Page>
         <PageHeader>
-          <Height>9.33926cm</Height>
+          <Height>8.82332cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -1663,7 +1654,7 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(59,1)</Value>
+                      <Value>=Code.GetData(10,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1691,7 +1682,7 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(60,1)</Value>
+                      <Value>=Code.GetData(11,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1719,7 +1710,7 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(61,1)</Value>
+                      <Value>=Code.GetData(12,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1758,8 +1749,8 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>251.98498pt</Top>
-              <Left>3.41378cm</Left>
+              <Top>236.7349pt</Top>
+              <Left>3.41379cm</Left>
               <Height>10pt</Height>
               <Width>5.4451cm</Width>
               <ZIndex>19</ZIndex>
@@ -1784,63 +1775,11 @@ Cstr(Fields!ShpCaptionLbl2.value)</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>251.35994pt</Top>
-              <Left>0.04369cm</Left>
+              <Top>236.10986pt</Top>
+              <Left>0.08739cm</Left>
               <Height>10pt</Height>
               <Width>3.15cm</Width>
               <ZIndex>20</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="SalesInvoiceHeaderPostingDate2">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(62,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>235.48517pt</Top>
-              <Left>3.37009cm</Left>
-              <Height>10pt</Height>
-              <Width>5.4451cm</Width>
-              <ZIndex>21</ZIndex>
-              <Style>
-                <VerticalAlign>Middle</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="SalesInvoiceHeaderPostingDateCaption2">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(63,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <Top>234.86013pt</Top>
-              <Left>0.04369cm</Left>
-              <Height>10pt</Height>
-              <Width>3.15cm</Width>
-              <ZIndex>22</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -2124,9 +2063,6 @@ End Function</Code>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
-        <Field Name="NoAlbaran">
-          <DataField>NoAlbaran</DataField>
-        </Field>
         <Field Name="No_SalesInvoiceHeader">
           <DataField>No_SalesInvoiceHeader</DataField>
         </Field>
@@ -2328,18 +2264,6 @@ End Function</Code>
         <Field Name="PricesInclVAT_SalesInvHdrCaption">
           <DataField>PricesInclVAT_SalesInvHdrCaption</DataField>
         </Field>
-        <Field Name="CompShip1">
-          <DataField>CompShip1</DataField>
-        </Field>
-        <Field Name="CompShip2">
-          <DataField>CompShip2</DataField>
-        </Field>
-        <Field Name="CompShip3">
-          <DataField>CompShip3</DataField>
-        </Field>
-        <Field Name="ShpCaptionLbl2">
-          <DataField>ShpCaptionLbl2</DataField>
-        </Field>
         <Field Name="DimText">
           <DataField>DimText</DataField>
         </Field>
@@ -2532,11 +2456,11 @@ End Function</Code>
         <Field Name="Quantity_SalesShipmentBufferFormat">
           <DataField>Quantity_SalesShipmentBufferFormat</DataField>
         </Field>
-        <Field Name="DimText1">
-          <DataField>DimText1</DataField>
-        </Field>
         <Field Name="ShpCaption">
           <DataField>ShpCaption</DataField>
+        </Field>
+        <Field Name="DimText1">
+          <DataField>DimText1</DataField>
         </Field>
         <Field Name="LineDimsCaption">
           <DataField>LineDimsCaption</DataField>

@@ -2,11 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Ana",
+            // "name": "Ana",
+            "name": "Microsoft cloud sandbox",
             "request": "launch",
             "type": "al",
             "environmentType": "Sandbox",
-            "environmentName": "Desarrollo_20240916",
+            "tenant": "bf927470-9155-475f-b9ab-b34833843bcf",
+            "environmentName": "ZZ_NOV24",
             "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": "All",

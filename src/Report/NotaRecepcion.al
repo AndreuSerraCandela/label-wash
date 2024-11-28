@@ -12,12 +12,13 @@ Report 50100 "Notas Recepcion Servitec"
 
     dataset
     {
-        dataitem("Sales Invoice Header"; "Purchase Header")
+        dataitem(PurchaseHeader; "Purchase Header")
         {
             DataItemTableView = SORTING("No.");
 
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
 
+            column(NoAlbaran; NoAlbaran) { }
             column(No_SalesInvoiceHeader;
             "No.")
             { }
@@ -67,7 +68,7 @@ Report 50100 "Notas Recepcion Servitec"
             { }
 
             column(ExternalDocumentNo;
-            Format("Sales Invoice Header".Recepcion))
+            Format(PurchaseHeader.Recepcion))
             { }
 
             column(NoDocExtLblCaption;
@@ -173,11 +174,11 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(BilltoCustNo_SalesInvHdr
-                ; "Sales Invoice Header"."Bill-to Customer No.")
+                ; PurchaseHeader."Bill-to Customer No.")
                     { }
 
                     column(PostingDate_SalesInvHdr
-                ; FORMAT("Sales Invoice Header"."Posting Date"))
+                ; FORMAT(PurchaseHeader."Posting Date"))
                     { }
 
                     column(VATNoText
@@ -185,11 +186,11 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(VATRegNo_SalesInvHeader
-                ; "Sales Invoice Header"."VAT Registration No.")
+                ; PurchaseHeader."VAT Registration No.")
                     { }
 
                     column(DueDate_SalesInvHeader
-                ; FORMAT("Sales Invoice Header"."Due Date"))
+                ; FORMAT(PurchaseHeader."Due Date"))
                     { }
 
                     column(SalesPersonText
@@ -201,7 +202,7 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(No_SalesInvoiceHeader1
-                ; "Sales Invoice Header"."Bill-to Name")
+                ; PurchaseHeader."Bill-to Name")
                     { }
 
                     column(ReferenceText
@@ -209,7 +210,7 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(YourReference_SalesInvHdr
-                ; "Sales Invoice Header"."Your Reference")
+                ; PurchaseHeader."Your Reference")
                     { }
 
                     column(OrderNoText
@@ -217,7 +218,7 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(OrderNo_SalesInvHeader
-                ; "Sales Invoice Header"."No.")
+                ; PurchaseHeader."No.")
                     { }
 
                     column(CustAddr7
@@ -237,11 +238,11 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(DocDate_SalesInvoiceHdr
-                ; FORMAT("Sales Invoice Header"."Document Date", 0, 4))
+                ; FORMAT(PurchaseHeader."Document Date", 0, 4))
                     { }
 
                     column(PricesInclVAT_SalesInvHdr
-                ; "Sales Invoice Header"."Prices Including VAT")
+                ; PurchaseHeader."Prices Including VAT")
                     { }
 
                     column(OutputNo
@@ -249,7 +250,7 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(PricesInclVATYesNo
-                ; FORMAT("Sales Invoice Header"."Prices Including VAT"))
+                ; FORMAT(PurchaseHeader."Prices Including VAT"))
                     { }
 
                     column(PageCaption
@@ -289,21 +290,25 @@ Report 50100 "Notas Recepcion Servitec"
                     { }
 
                     column(BilltoCustNo_SalesInvHdrCaption
-                ; "Sales Invoice Header".FIELDCAPTION("Bill-to Customer No."))
+                ; PurchaseHeader.FIELDCAPTION("Bill-to Customer No."))
                     { }
 
                     column(PricesInclVAT_SalesInvHdrCaption
-                ; "Sales Invoice Header".FIELDCAPTION("Prices Including VAT"))
+                ; PurchaseHeader.FIELDCAPTION("Prices Including VAT"))
                     { }
 
+                    column(CompShip1; CompanyInfo."Ship-to Address") { }
+                    column(CompShip2; CompanyInfo."Ship-to City") { }
+                    column(CompShip3; CompanyInfo."Ship-to Post Code") { }
 
+                    column(ShpCaptionLbl2; ShpCaptionLbl2) { }
 
                     dataItem(DimensionLoop1; integer)
                     {
                         DataItemTableView = SORTING(Number)
                                             WHERE(Number = FILTER(1 ..));
 
-                        DataItemLinkReference = "Sales Invoice Header";
+                        DataItemLinkReference = PurchaseHeader;
 
                         column(DimText; DimText) { }
 
@@ -349,7 +354,7 @@ Report 50100 "Notas Recepcion Servitec"
                     {
                         DataItemTableView = SORTING("Document No.", "Line No.");
 
-                        DataItemLinkReference = "Sales Invoice Header";
+                        DataItemLinkReference = PurchaseHeader;
                         DataItemLink = "Document No." = FIELD("No."), "Document Type" = FIELD("Document Type");
 
                         column(GetCarteraInvoice;
@@ -360,7 +365,7 @@ Report 50100 "Notas Recepcion Servitec"
                         "Line Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(Description_SalesInvLine;
@@ -383,8 +388,9 @@ Report 50100 "Notas Recepcion Servitec"
                         "Direct Unit Cost")
                         {
                             AutoFormatType = 2;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
+
 
                         column(LineDisc_SalesInvoiceLine;
                         "Line Discount %")
@@ -406,28 +412,28 @@ Report 50100 "Notas Recepcion Servitec"
                         -"Inv. Discount Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(TotalSubTotal;
                         TotalSubTotal)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(TotalInvoiceDiscountAmount;
                         TotalInvoiceDiscountAmount)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(TotalAmount;
                         TotalAmount)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(TotalGivenAmount;
@@ -438,21 +444,21 @@ Report 50100 "Notas Recepcion Servitec"
                         Amount)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(AmountIncludingVATAmount;
                         "Amount Including VAT" - Amount)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(Amount_SalesInvoiceLineIncludingVAT;
                         "Amount Including VAT")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmtLineVATAmtText;
@@ -471,18 +477,18 @@ Report 50100 "Notas Recepcion Servitec"
                         TotalAmountInclVAT)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(TotalAmountVAT;
                         TotalAmountVAT)
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATBaseDisc_SalesInvHdr;
-                        "Sales Invoice Header"."VAT Base Discount %")
+                        PurchaseHeader."VAT Base Discount %")
                         {
                             AutoFormatType = 1;
                         }
@@ -568,7 +574,7 @@ Report 50100 "Notas Recepcion Servitec"
                             column(Quantity_SalesShipmentBuffer; SalesShipmentBuffer.Quantity)
                             { DecimalPlaces = 0 : 5; }
 
-                            column(ShpCaption; ShpCaptionLbl) { }
+
                             trigger OnPreDataItem()
                             BEGIN
                                 SalesShipmentBuffer.SETRANGE("Document No.", "Sales Invoice Line"."Document No.");
@@ -594,6 +600,7 @@ Report 50100 "Notas Recepcion Servitec"
 
 
                             column(DimText1; DimText) { }
+                            column(ShpCaption; ShpCaptionLbl) { }
 
                             column(LineDimsCaption; LineDimsCaptionLbl) { }
                             trigger OnPreDataItem()
@@ -710,10 +717,10 @@ Report 50100 "Notas Recepcion Servitec"
                                 IF "Allow Invoice Disc." THEN
                                     VATAmountLine."Inv. Disc. Base Amount" := "Line Amount";
                                 VATAmountLine."Invoice Discount Amount" := "Inv. Discount Amount";
-                                VATAmountLine.SetCurrencyCode("Sales Invoice Header"."Currency Code");
+                                VATAmountLine.SetCurrencyCode(PurchaseHeader."Currency Code");
                                 VATAmountLine."VAT Difference" := "VAT Difference";
                                 VATAmountLine."EC Difference" := "EC Difference";
-                                IF "Sales Invoice Header"."Prices Including VAT" THEN
+                                IF PurchaseHeader."Prices Including VAT" THEN
                                     VATAmountLine."Prices Including VAT" := TRUE;
                                 VATAmountLine.InsertLine;
 
@@ -736,42 +743,42 @@ Report 50100 "Notas Recepcion Servitec"
                         VATAmountLine."VAT Base")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmountLineVATAmount;
                         VATAmountLine."VAT Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmountLineLineAmount;
                         VATAmountLine."Line Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmtLineInvDiscBaseAmt;
                         VATAmountLine."Inv. Disc. Base Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmtLineInvDiscountAmt;
                         VATAmountLine."Invoice Discount Amount" + VATAmountLine."Pmt. Discount Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmtLineECAmount;
                         VATAmountLine."EC Amount")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmountLineVAT;
@@ -786,7 +793,7 @@ Report 50100 "Notas Recepcion Servitec"
                         VATAmountLine."EC %")
                         {
                             AutoFormatType = 1;
-                            AutoFormatExpression = "Sales Invoice Header"."Currency Code";
+                            AutoFormatExpression = PurchaseHeader."Currency Code";
                         }
 
                         column(VATAmtLineVATCaption;
@@ -880,7 +887,7 @@ Report 50100 "Notas Recepcion Servitec"
                         trigger OnPreDataItem()
                         BEGIN
                             IF (NOT GLSetup."Print VAT specification in LCY") OR
-                                ("Sales Invoice Header"."Currency Code" = '')
+                                (PurchaseHeader."Currency Code" = '')
                             THEN
                                 CurrReport.BREAK;
 
@@ -892,8 +899,8 @@ Report 50100 "Notas Recepcion Servitec"
                             ELSE
                                 VALSpecLCYHeader := Text007 + FORMAT(GLSetup."LCY Code");
 
-                            CurrExchRate.FindCurrency("Sales Invoice Header"."Posting Date", "Sales Invoice Header"."Currency Code", 1);
-                            CalculatedExchRate := ROUND(1 / "Sales Invoice Header"."Currency Factor" * CurrExchRate."Exchange Rate Amount", 0.000001);
+                            CurrExchRate.FindCurrency(PurchaseHeader."Posting Date", PurchaseHeader."Currency Code", 1);
+                            CalculatedExchRate := ROUND(1 / PurchaseHeader."Currency Factor" * CurrExchRate."Exchange Rate Amount", 0.000001);
                             VALExchRate := STRSUBSTNO(Text009, CalculatedExchRate, CurrExchRate."Exchange Rate Amount");
                         END;
 
@@ -901,8 +908,8 @@ Report 50100 "Notas Recepcion Servitec"
                         BEGIN
                             VATAmountLine.GetLine(Number);
 
-                            VALVATBaseLCY := ROUND(VATAmountLine."VAT Base" / "Sales Invoice Header"."Currency Factor");
-                            VALVATAmountLCY := ROUND(VATAmountLine."VAT Amount" / "Sales Invoice Header"."Currency Factor");
+                            VALVATBaseLCY := ROUND(VATAmountLine."VAT Base" / PurchaseHeader."Currency Factor");
+                            VALVATAmountLCY := ROUND(VATAmountLine."VAT Amount" / PurchaseHeader."Currency Factor");
                         END;
                     }
 
@@ -918,7 +925,7 @@ Report 50100 "Notas Recepcion Servitec"
                                     WHERE(Number = CONST(1));
 
 
-                        column(SelltoCustNo_SalesInvHdr; "Sales Invoice Header"."Sell-to Customer No.") { }
+                        column(SelltoCustNo_SalesInvHdr; PurchaseHeader."Sell-to Customer No.") { }
 
                         column(ShipToAddr1; ShipToAddr[1]) { }
 
@@ -938,7 +945,7 @@ Report 50100 "Notas Recepcion Servitec"
 
                         column(ShiptoAddressCaption; ShiptoAddressCaptionLbl) { }
 
-                        column(SelltoCustNo_SalesInvHdrCaption; "Sales Invoice Header".FIELDCAPTION("Sell-to Customer No.")) { }
+                        column(SelltoCustNo_SalesInvHdrCaption; PurchaseHeader.FIELDCAPTION("Sell-to Customer No.")) { }
                         trigger OnPreDataItem()
                         BEGIN
                             IF NOT ShowShippingAddr THEN
@@ -979,7 +986,7 @@ Report 50100 "Notas Recepcion Servitec"
                 trigger OnPostDataItem()
                 BEGIN
                     IF NOT CurrReport.PREVIEW THEN
-                        SalesInvCountPrinted.RUN("Sales Invoice Header");
+                        SalesInvCountPrinted.RUN(PurchaseHeader);
                 END;
             }
             trigger OnAfterGetRecord()
@@ -1107,6 +1114,11 @@ Report 50100 "Notas Recepcion Servitec"
                     IF ShipToAddr[i] <> CustAddr[i] THEN
                         ShowShippingAddr := TRUE;
 
+
+                AlbaranCompra.SetRange("Order No.", PurchaseHeader."No.");
+                if AlbaranCompra.FindLast() then
+                    NoAlbaran := AlbaranCompra."No.";
+
                 // IF LogInteraction THEN
                 //     IF NOT CurrReport.PREVIEW THEN BEGIN
                 //         IF "Bill-to Contact No." <> '' THEN
@@ -1165,6 +1177,10 @@ Report 50100 "Notas Recepcion Servitec"
     }
 
     VAR
+        NoAlbaran: Code[20];
+        AlbaranCompra: Record "Purch. Rcpt. Header";
+        //= AlbaranCompra."No.";
+
         Text000: TextConst ENU = 'Salesperson', ESP = 'Vendedor';
         Text001: TextConst ENU = 'Total %1', ESP = 'Total %1';
         Text002: TextConst ENU = 'Total %1 Incl. VAT', ESP = 'Total %1 IVA incl.';
@@ -1259,6 +1275,7 @@ Report 50100 "Notas Recepcion Servitec"
         PmtDiscGivenAmtCaptionLbl: TextConst ENU = 'Payment Disc Given Amount', ESP = 'Importe descuento pago';
         PmtDiscVATCaptionLbl: TextConst ENU = 'Payment Discount on VAT', ESP = 'Descuento P.P. sobre IVA';
         ShpCaptionLbl: TextConst ENU = 'Shipment', ESP = 'Envío';
+        ShpCaptionLbl2: TextConst ENU = 'Shipment No.', ESP = 'No. Albarán';
         LineDimsCaptionLbl: TextConst ENU = 'Line Dimensions', ESP = 'Dimensiones línea';
         VATAmtLineVATCaptionLbl: TextConst ENU = 'VAT %', ESP = '% IVA';
         VATECBaseCaptionLbl: TextConst ENU = 'VAT Base', ESP = 'Base IVA';
@@ -1327,7 +1344,7 @@ Report 50100 "Notas Recepcion Servitec"
         SalesShipmentBuffer2: Record 7190 TEMPORARY;
     BEGIN
         NextEntryNo := 1;
-        EXIT("Sales Invoice Header"."Posting Date");
+        EXIT(PurchaseHeader."Posting Date");
 
 
     END;
@@ -1342,7 +1359,7 @@ Report 50100 "Notas Recepcion Servitec"
         TotalQuantity := SalesInvoiceLine2."Quantity (Base)";
         ValueEntry.SETCURRENTKEY("Document No.");
         ValueEntry.SETRANGE("Document No.", SalesInvoiceLine2."Document No.");
-        ValueEntry.SETRANGE("Posting Date", "Sales Invoice Header"."Posting Date");
+        ValueEntry.SETRANGE("Posting Date", PurchaseHeader."Posting Date");
         ValueEntry.SETRANGE("Item Charge No.", '');
         ValueEntry.SETFILTER("Entry No.", '%1..', FirstValueEntryNo);
         IF ValueEntry.FIND('-') THEN
@@ -1411,9 +1428,9 @@ Report 50100 "Notas Recepcion Servitec"
         WITH CustLedgEntry DO BEGIN
             SETCURRENTKEY("Document No.", "Document Type", "Customer No.");
             SETRANGE("Document Type", "Document Type"::Invoice);
-            SETRANGE("Document No.", "Sales Invoice Header"."No.");
-            SETRANGE("Customer No.", "Sales Invoice Header"."Bill-to Customer No.");
-            SETRANGE("Posting Date", "Sales Invoice Header"."Posting Date");
+            SETRANGE("Document No.", PurchaseHeader."No.");
+            SETRANGE("Customer No.", PurchaseHeader."Bill-to Customer No.");
+            SETRANGE("Posting Date", PurchaseHeader."Posting Date");
             IF FIND('-') THEN
                 IF CustLedgEntry."Document Situation" = CustLedgEntry."Document Situation"::" " THEN
                     EXIT(FALSE)

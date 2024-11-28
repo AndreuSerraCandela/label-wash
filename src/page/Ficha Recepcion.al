@@ -24,6 +24,7 @@ page 50100 "Recepción Mercancía"
                         CurrPage.Update();
                     end;
                 }
+
                 field("Bill-to Customer Name"; Rec."Bill-to Name")
                 {
                     ApplicationArea = Basic, Suite;
@@ -41,6 +42,9 @@ page 50100 "Recepción Mercancía"
                         exit(Rec.LookupBillToCustomerName(Text));
                     end;
                 }
+                //  field("Receiving No."; Rec."Receiving No.") { ApplicationArea = All; }
+                //  field("Last Receiving No."; Rec."Last Receiving No.") { ApplicationArea = All; Editable = true; }
+                //field()
                 field("VAT Registration No."; Rec."VAT Registration No.")
                 {
                     ApplicationArea = All;
