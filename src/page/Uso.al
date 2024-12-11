@@ -184,6 +184,38 @@ page 50103 "Uso Mercancía"
                     Recibir(CODEUNIT::"Purch.-Post (Yes/No)", Enum::"Navigate After Posting"::"New Document");
                 end;
             }
+            action(Release)
+            {
+                ApplicationArea = all;
+                Caption = 'Re&lease';
+                Image = ReleaseDoc;
+                ShortCutKey = 'Ctrl+F9';
+                ToolTip = 'Release the document to the next stage of processing. You must reopen the document before you can make changes to it.';
+
+                trigger OnAction()
+                begin
+                    Rec.PerformManualRelease();
+                    //  CurrPage.PurchLines.PAGE.ClearTotalPurchaseHeader();
+                    CurrPage.LineasRecepcion.Page.ClearTotalPurchaseHeader();
+                end;
+            }
+            action(Reopen)
+            {
+                ApplicationArea = all;
+                Caption = 'Re&open';
+                Enabled = Rec.Status <> Rec.Status::Open;
+                Image = ReOpen;
+                ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
+
+                trigger OnAction()
+                var
+                    ReleasePurchDoc: Codeunit "Release Purchase Document";
+                begin
+                    ReleasePurchDoc.PerformManualReopen(Rec);
+                    //CurrPage.PurchLines.PAGE.ClearTotalPurchaseHeader();
+                    CurrPage.LineasRecepcion.Page.ClearTotalPurchaseHeader();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -459,5 +491,6 @@ page 50103 "Uso Mercancía"
     var
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         OpenPostedPurchaseOrderQst: Label 'El Recibo se ha registrado con el numero %1 y. se ha movidoa la ventana de albaranes, quiere verlo?', Comment = '%1 = posted document number';
+        PagOrderCompra: page 137;
 
 }

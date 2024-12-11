@@ -148,4 +148,72 @@ codeunit 50100 EventosTratamientos
         IsHandled := PurchaseHeader.Recepcion <> Recepcion::" ";
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Purchase Receipt Line", 'OnUpdateOrderLineOnBeforeUpdatePurchLine', '', false, false)]
+    procedure OnUpdateOrderLineOnBeforeUpdatePurchLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchaseLine: Record "Purchase Line")
+    var
+        PurchaseHeader: Record "Purchase Header";
+        UndoQty: Decimal;
+        UndoQtyBase: Decimal;
+    begin
+        UndoQty := -PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced";
+        UndoQtyBase := -PurchRcptLine."Quantity (Base)" - PurchRcptLine."Qty. Invoiced (Base)";
+
+        PurchaseHeader.SetRange("Document Type", PurchaseLine."Document Type");
+        PurchaseHeader.SetRange("No.", PurchaseLine."Document No.");
+        if PurchaseHeader.FindFirst() then
+            if PurchaseHeader.Recepcion = PurchaseHeader.Recepcion::Uso then begin
+
+                PurchaseLine."Cantidad a Uso" := PurchaseLine."Cantidad a Uso" - UndoQty; //PurchaseLine."Qty. to Receive";
+                PurchaseLine."Cantidad a uso Base" := PurchaseLine."Cantidad a uso Base" - UndoQtyBase;// PurchaseLine."Qty. to Receive (Base)";
+                PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad Usada" - (PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced");
+                PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad Usada Base" - (PurchRcptLine."Quantity (Base)" - PurchRcptLine."Qty. Invoiced (Base)");
+                PurchaseLine."Cantidad a facturar Uso" := PurchaseLine."Cantidad a facturar Uso" - UndoQty;
+
+
+            end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Posting Management", 'OnBeforeUpdatePurchLine', '', false, false)]
+    procedure OnBeforeUpdatePurchLine(PurchaseLine: Record "Purchase Line"; var UndoQty: Decimal; var UndoQtyBase: Decimal; var TempUndoneItemLedgEntry: Record "Item Ledger Entry" temporary; var IsHandled: Boolean)
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        PurchaseHeader.SetRange("Document Type", PurchaseLine."Document Type");
+        PurchaseHeader.SetRange("No.", PurchaseLine."Document No.");
+        if PurchaseHeader.FindFirst() then
+            if PurchaseHeader.Recepcion = PurchaseHeader.Recepcion::Uso then begin
+
+                // PurchaseLine."Cantidad a Uso" := UndoQty; //PurchaseLine."Qty. to Receive";
+                // PurchaseLine."Cantidad a uso Base" := UndoQtyBase;// PurchaseLine."Qty. to Receive (Base)";
+                // PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad Usada" - UndoQty;//PurchaseLine."Cantidad a uso";
+                // PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad Usada Base" - UndoQtyBase;//PurchaseLine."Cantidad a uso Base";
+                // PurchaseLine."Cantidad a facturar Uso" := UndoQty; // PurchaseLine."Cantidad a uso";
+                // PurchaseLine.Modify();
+                // Error('');
+            end;
+    end;
+
+
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterInitOutstandingQty', '', false, false)]
+    procedure OnAfterInitOutstandingQty(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        PurchaseHeader.SetRange("Document Type", PurchaseLine."Document Type");
+        PurchaseHeader.SetRange("No.", PurchaseLine."Document No.");
+        if PurchaseHeader.FindFirst() then
+            if PurchaseHeader.Recepcion = PurchaseHeader.Recepcion::Uso then begin
+
+                // PurchaseLine."Cantidad a Uso" := PurchaseLine."Qty. to Receive";
+                // PurchaseLine."Cantidad a uso Base" := PurchaseLine."Qty. to Receive (Base)";
+                // PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad Usada" - PurchaseLine."Cantidad a uso";
+                // PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad Usada Base" - PurchaseLine."Cantidad a uso Base";
+                // PurchaseLine."Cantidad a facturar Uso" := PurchaseLine."Cantidad a uso";
+                // Error('');
+
+            end;
+
+    end;
+
 }
