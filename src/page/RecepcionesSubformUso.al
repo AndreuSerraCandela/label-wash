@@ -191,11 +191,7 @@ page 50147 "Subform Uso"
                             CurrPage.Update(false);
                     end;
                 }
-                field("Quantity (Base)"; Rec."Quantity (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Quantity (Base) field.', Comment = '%';
-                }
+
 
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
@@ -223,14 +219,9 @@ page 50147 "Subform Uso"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies how many units on the order line have not yet been received.';
-                    Editable = true;
+                    // Editable = true;
                 }
-                field("Outstanding Qty. (Base)"; Rec."Outstanding Qty. (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the outstanding quantity expressed in the base units of measure.';
-                    Editable = true;
-                }
+
                 field("Qty. to Receive"; Rec."Qty. to Receive")
                 {
                     ApplicationArea = All;
@@ -240,45 +231,21 @@ page 50147 "Subform Uso"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies how many units of the item on the line have been posted as received.';
-                    Editable = true;
-                }
-                field("Qty. Received (Base)"; Rec."Qty. Received (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. Received (Base) field.', Comment = '%';
-                    Editable = true;
-                }
 
+                }
 
                 field("Qty. Rcd. Not Invoiced"; Rec."Qty. Rcd. Not Invoiced")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the value of the Qty. Rcd. Not Invoiced field.', Comment = '%';
-                    Editable = true;
+
                 }
-                field("Qty. Rcd. Not Invoiced (Base)"; Rec."Qty. Rcd. Not Invoiced (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. Rcd. Not Invoiced (Base) field.', Comment = '%';
-                    Editable = true;
-                }
+
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
                 }
-                field("Qty. to Invoice (Base)"; Rec."Qty. to Invoice (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. to Invoice (Base) field.', Comment = '%';
-                }
-                field("Qty. to Receive (Base)"; Rec."Qty. to Receive (Base)")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Qty. to Receive (Base) field.', Comment = '%';
-                }
-
-
 
 
                 field("Cantidad a Usar"; Rec."Cantidad a Tratar")
