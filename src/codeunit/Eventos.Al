@@ -194,7 +194,7 @@ codeunit 50100 EventosTratamientos
     end;
 
 
-
+    //pdte de quitar
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterInitOutstandingQty', '', false, false)]
     procedure OnAfterInitOutstandingQty(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")
     var
