@@ -187,7 +187,7 @@ page 50104 "Tratamiento Mercancía"
             action("&Facturar")
             {
                 ApplicationArea = All;
-                Caption = 'Facturar';
+                Caption = 'Facturar Tratamiento';
                 Promoted = true;
                 PromotedCategory = Process;
                 ToolTip = 'Facturar Tratamiento';
@@ -344,7 +344,7 @@ page 50104 "Tratamiento Mercancía"
         SalesHeader.Modify(true);
         PurchLine.SetRange("Document Type", PurchHeader."Document Type");
         PurchLine.SetRange("Document No.", PurchHeader."No.");
-        if PurchLine.FindSet() then
+        if PurchLine.FindSet() then begin
             repeat
                 SalesLine.Init();
                 SalesLine."Document Type" := SalesHeader."Document Type";
@@ -372,6 +372,8 @@ page 50104 "Tratamiento Mercancía"
                 SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
                 SalesLine.Insert(true);
             until PurchLine.Next() = 0;
+        end else
+            Error('No hay lineas para facturar. Compruebe si ha recibido la mercancía, y si no la ha facturado');
         Commit();
         Page.Runmodal(0, SalesHeader);
     end;

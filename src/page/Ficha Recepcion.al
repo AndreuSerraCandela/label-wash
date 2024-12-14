@@ -196,7 +196,7 @@ page 50100 "Recepción Mercancía"
             action("&Facturar envio")
             {
                 ApplicationArea = All;
-                Caption = 'Facturar Recepción';
+                Caption = 'Facturar Recepción única';
                 Promoted = true;
                 PromotedCategory = Process;
                 ToolTip = 'Facturar Recepcion';

@@ -498,8 +498,8 @@ page 50102 "Mercancía Clientes"
             action("&Facturar Tratamiento")
             {
                 ApplicationArea = All;
-                Caption = 'Facturar';
-                ToolTip = 'Facturar Recepcion Cliente';
+                Caption = 'Facturar Tratamiento Cliente';
+                ToolTip = 'Facturar tratamientio Cliente';
                 Image = Invoice;
                 trigger OnAction()
                 begin
@@ -509,7 +509,7 @@ page 50102 "Mercancía Clientes"
             action("&Facturar Tratamiento Clientes")
             {
                 ApplicationArea = All;
-                Caption = 'Facturar';
+                Caption = 'Facturar Tratamientos de todos los Clientes';
                 ToolTip = 'Facturar Recepcion Clientes';
                 Image = "Invoicing-Document";
                 trigger OnAction()
@@ -606,8 +606,9 @@ page 50102 "Mercancía Clientes"
         Fechas: Page "Date-Time Dialog";
         Fecha: Date;
         LineNo: Integer;
+        HayError: Boolean;
     begin
-        Message(('Elija fecha hasta la que se facturará'));
+        Message(('Elija fecha hasta la que se facturará el tartamiento'));
         Fechas.RunModal();
         Fecha := Fechas.GetDate();
         SalesHeader.Init();
@@ -622,8 +623,10 @@ page 50102 "Mercancía Clientes"
         PurchHeader.SetRange("Bill-to Customer No.", Purch."Bill-to Customer No.");
         PurchHeader.SetRange(Recepcion, PurchHeader.Recepcion::Tratamiento);
         PurchHeader.SetRange("Order Date", 0D, Fecha);
+        HayError := true;
         If PurchHeader.FindFirst() Then
             repeat
+
                 PurchLine.SetRange("Document Type", PurchHeader."Document Type");
                 PurchLine.SetRange("Document No.", PurchHeader."No.");
                 if PurchLine.FindSet() then
@@ -652,11 +655,16 @@ page 50102 "Mercancía Clientes"
                         SalesLine.Description := PurchLine.Description;
                         SalesLine."Pedido Compra" := PurchLine."Document No.";
                         SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
-                        If SalesLine."Quantity" > 0 then
+                        If SalesLine."Quantity" > 0 then begin
                             SalesLine.Insert(true);
+                            HayError := false;
+                        end;
                     until PurchLine.Next() = 0;
             until PurchHeader.Next() = 0;
-        Commit();
+        If HayError then
+            error('O bien no hay lineas tratadas, o ya han sido facturadas')
+        else
+            Commit();
         if Mostrar then
             Page.Runmodal(0, SalesHeader);
     end;
