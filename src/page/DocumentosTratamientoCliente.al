@@ -28,6 +28,11 @@ page 50102 "Mercancía Clientes"
                         CurrPage.Update();
                     end;
                 }
+                field(Tipo; Rec.Recepcion)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Tipo de Documento';
+                }
                 field("Bill-to Customer Name"; Rec."Bill-to Name")
                 {
                     ApplicationArea = Basic, Suite;
@@ -495,44 +500,78 @@ page 50102 "Mercancía Clientes"
 
                 end;
             }
-            action("&Facturar Tratamiento")
+            action("&Facturar Tratamiento Pedido")
             {
                 ApplicationArea = All;
-                Caption = 'Facturar Tratamiento Cliente';
-                ToolTip = 'Facturar tratamientio Cliente';
+                Caption = 'Facturar Tratamiento Pedido';
+                ToolTip = 'Facturar tratamientio pedido';
                 Image = Invoice;
                 trigger OnAction()
+                var
+                    G: Guid;
+                    SalesHeader: Record "Sales Header";
                 begin
-                    Facturar(Rec, true);
+                    g := CreateGuid();
+                    Facturar(Rec, G, true);
+                    Commit();
+                    SalesHeader.SetRange("Proceso Facturación", G);
+                    Page.Runmodal(0, SalesHeader);
                 end;
             }
             action("&Facturar Tratamiento Clientes")
             {
                 ApplicationArea = All;
                 Caption = 'Facturar Tratamientos de todos los Clientes';
-                ToolTip = 'Facturar Recepcion Clientes';
+                ToolTip = 'Facturar Tratamientos de todos los Clientes';
                 Image = "Invoicing-Document";
                 trigger OnAction()
                 var
                     PurchHeader: Record "Purchase Header";
-                    Custos: Record "Customer" temporary;
+                    G: Guid;
+                    SalesHeader: Record "Sales Header";
                 begin
+                    G := CreateGuid();
                     CurrPage.SetSelectionFilter(PurchHeader);
                     If PurchHeader.Count = 1 then
-                        if not Confirm('Solo ha seleccionado una recepción,¿Desea facturar la recepción seleccionada?', true) then
+                        Error('Solo ha seleccionado un tratamiento,No esta usando el punto adecuado', true);
+                    If PurchHeader.FindSet() then
+                        repeat
+                            Facturar(PurchHeader, G, false);
+
+                        until PurchHeader.Next() = 0;
+                    Commit();
+                    SalesHeader.SetRange("Proceso Facturación", G);
+                    Page.Runmodal(0, SalesHeader);
+                end;
+            }
+            action("&Facturar Rececciones Clientes")
+            {
+                ApplicationArea = All;
+                Caption = 'Facturar Recepciones de todos los Clientes';
+                ToolTip = 'Facturar Recepciones de todos los Clientes';
+                Image = "Invoicing-Document";
+                trigger OnAction()
+                var
+                    PurchHeader: Record "Purchase Header";
+                    G: Guid;
+                    SalesHeader: Record "Sales Header";
+                begin
+                    G := CreateGuid();
+                    CurrPage.SetSelectionFilter(PurchHeader);
+                    If PurchHeader.Count = 1 then
+                        if not Confirm('Solo ha seleccionado una recepcion,¿Desea facturar la recepción seleccionada?', true) then
                             exit;
                     If PurchHeader.FindSet() then
                         repeat
-                            if not Custos.Get(PurchHeader."Bill-to Customer No.") then
-                                Facturar(PurchHeader, false);
-                            Custos.Init();
-                            Custos."No." := PurchHeader."Bill-to Customer No.";
-                            if Custos.Insert() then;
+                            FacturarRecepcion(PurchHeader, G);
                         until PurchHeader.Next() = 0;
+                    Commit();
+                    SalesHeader.SetRange("Proceso Facturación", G);
+                    Page.Runmodal(0, SalesHeader);
                 end;
+
             }
         }
-
         area(Promoted)
         {
             actionref(Edit_Ref; Editar) { }
@@ -540,7 +579,7 @@ page 50102 "Mercancía Clientes"
             actionref(Envio_Para_uso_desde_Cliente_Ref; "Envio Para uso desde Nuevo") { }
             actionref(Recepcion_para_tratar_Ref; "Recepcion para tratar") { }
             actionref(Envio_Para_uso_desde_Tratamiento_Ref; "Envio Para uso desde Tratamiento") { }
-            actionref(Facturar_Tratamiento_Ref; "&Facturar Tratamiento") { }
+            actionref(Facturar_Recepciones_Ref; "&Facturar Rececciones Clientes") { }
         }
     }
     var
@@ -596,77 +635,101 @@ page 50102 "Mercancía Clientes"
     // begin
     //     ItemJnlPostLine.RunWithCheck(ItemJnlLineToPost);
     // end;
-    local procedure Facturar(var Purch: Record "Purchase Header"; Mostrar: Boolean)
+    local procedure Facturar(var Purch: Record "Purchase Header"; G: Guid; Mostrar: Boolean)
     var
         PurchLine: Record "Purchase Line";
-        PurchHeader: Record "Purchase Header";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         ConfGrupos: Record 252;
-        Fechas: Page "Date-Time Dialog";
-        Fecha: Date;
+        //Fechas: Page "Date-Time Dialog";
+        //Fecha: Date;
         LineNo: Integer;
         HayError: Boolean;
     begin
-        Message(('Elija fecha hasta la que se facturará el tartamiento'));
-        Fechas.RunModal();
-        Fecha := Fechas.GetDate();
-        SalesHeader.Init();
-        SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
-        SalesHeader."Bill-to Customer No." := Purch."Bill-to Customer No.";
-        SalesHeader."Order Date" := WorkDate();
-        SalesHeader.Validate("Order Date", WorkDate());
-        SalesHeader.Insert(true);
-        SalesHeader.Validate("Sell-to Customer No.", Purch."Bill-to Customer No.");
-        SalesHeader.Modify(true);
-        PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
-        PurchHeader.SetRange("Bill-to Customer No.", Purch."Bill-to Customer No.");
-        PurchHeader.SetRange(Recepcion, PurchHeader.Recepcion::Tratamiento);
-        PurchHeader.SetRange("Order Date", 0D, Fecha);
-        HayError := true;
-        If PurchHeader.FindFirst() Then
+        //Message(('Elija fecha hasta la que se facturará el tartamiento'));
+        //Fechas.RunModal();
+        //Fecha := Fechas.GetDate();
+        SalesHeader.SetRange("Proceso Facturación", G);
+        SalesHeader.SetRange("Bill-to Customer No.", Purch."Bill-to Customer No.");
+        if not SalesHeader.FindFirst() then begin
+            SalesHeader.Init();
+            SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+            SalesHeader."Bill-to Customer No." := Purch."Bill-to Customer No.";
+            SalesHeader."Order Date" := WorkDate();
+            SalesHeader.Validate("Order Date", WorkDate());
+            SalesHeader.Insert(true);
+            SalesHeader.Validate("Sell-to Customer No.", Purch."Bill-to Customer No.");
+            SalesHeader."Proceso Facturación" := G;
+            SalesHeader.Modify(true);
+        end;
+        // PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Order);
+        // PurchHeader.SetRange("Bill-to Customer No.", Purch."Bill-to Customer No.");
+        // PurchHeader.SetRange(Recepcion, PurchHeader.Recepcion::Tratamiento);
+        // PurchHeader.SetRange("Order Date", 0D, Fecha);
+        // HayError := true;
+        //If PurchHeader.FindFirst() Then
+        //  repeat
+
+        PurchLine.SetRange("Document Type", Purch."Document Type");
+        PurchLine.SetRange("Document No.", Purch."No.");
+        if PurchLine.FindSet() then
             repeat
-
-                PurchLine.SetRange("Document Type", PurchHeader."Document Type");
-                PurchLine.SetRange("Document No.", PurchHeader."No.");
-                if PurchLine.FindSet() then
-                    repeat
+                SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                SalesLine.SetRange("Document No.", SalesHeader."No.");
+                SalesLine.SetRange("Description", PurchLine."Description");
+                If not SalesLine.FindSet() then begin
+                    SalesLine.SetRange("Description");
+                    If SalesLine.FindLast() then
+                        LineNo := SalesLine."Line No." + 10000
+                    else
                         LineNo += 10000;
-                        SalesLine.Init();
-                        SalesLine."Document Type" := SalesHeader."Document Type";
-                        SalesLine."Document No." := SalesHeader."No.";
-                        SalesLine."Line No." := LineNo;
-                        SalesLine."Pedido Compra" := PurchLine."Document No.";
-                        SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
-                        iF PurchLine.Type = PurchLine.TYPE::Item then begin
-                            SalesLine.Type := SalesLine.TYPE::"G/L Account";
-                            ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
-                            ConfGrupos.TestField("Sales Account");
-                            SalesLine.Validate("No.", ConfGrupos."Sales Account");
-                        end else begin
-                            SalesLine."Type" := PurchLine."Type";
-                            SalesLine.Validate("No.", PurchLine."No.");
-                            SalesLine."Variant Code" := PurchLine."Variant Code";
-                        end;
+                    SalesLine.Init();
+                    SalesLine."Document Type" := SalesHeader."Document Type";
+                    SalesLine."Document No." := SalesHeader."No.";
+                    SalesLine."Line No." := LineNo;
+                    SalesLine."Pedido Compra" := PurchLine."Document No.";
+                    SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
+                    iF PurchLine.Type = PurchLine.TYPE::Item then begin
+                        SalesLine.Type := SalesLine.TYPE::"G/L Account";
+                        ConfGrupos.get(Purch."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                        ConfGrupos.TestField("Sales Account");
+                        SalesLine.Validate("No.", ConfGrupos."Sales Account");
+                    end else begin
+                        SalesLine."Type" := PurchLine."Type";
+                        SalesLine.Validate("No.", PurchLine."No.");
+                        SalesLine."Variant Code" := PurchLine."Variant Code";
+                    end;
 
-                        SalesLine.Validate("Quantity", PurchLine."Cantidad Tratada" - PurchLine."Cantidad a facturada Tratada");
-                        SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
-                        SalesLine.vALIDATE("Unit Price", PurchLine."Precio Tratamiento");
-                        SalesLine.Description := PurchLine.Description;
-                        SalesLine."Pedido Compra" := PurchLine."Document No.";
-                        SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
-                        If SalesLine."Quantity" > 0 then begin
-                            SalesLine.Insert(true);
-                            HayError := false;
-                        end;
-                    until PurchLine.Next() = 0;
-            until PurchHeader.Next() = 0;
-        If HayError then
-            error('O bien no hay lineas tratadas, o ya han sido facturadas')
-        else
-            Commit();
-        if Mostrar then
-            Page.Runmodal(0, SalesHeader);
+                    SalesLine.Validate("Quantity", PurchLine."Cantidad Tratada" - PurchLine."Cantidad a facturada Tratada");
+                    SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
+                    SalesLine.vALIDATE("Unit Price", PurchLine."Precio Tratamiento");
+                    SalesLine.Description := PurchLine.Description;
+                    SalesLine."Pedido Compra" := PurchLine."Document No.";
+                    SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
+                    If SalesLine."Quantity" > 0 then begin
+                        SalesLine.Insert(true);
+                        HayError := false;
+                    end;
+                end else begin
+                    SalesLine.Validate("Quantity", SalesLine.Quantity + (PurchLine."Cantidad Tratada" - PurchLine."Cantidad a facturada Tratada"));
+                    SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
+                    SalesLine.vALIDATE("Unit Price", PurchLine."Precio Tratamiento");
+                    SalesLine.Description := PurchLine.Description;
+                    SalesLine."Pedido Compra" := PurchLine."Document No.";
+                    SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
+                    If SalesLine."Quantity" > 0 then begin
+                        SalesLine.Modify(true);
+                        HayError := false;
+                    end;
+                end;
+            until PurchLine.Next() = 0;
+        //until PurchHeader.Next() = 0;
+        //If HayError then
+        //   error('O bien no hay lineas tratadas, o ya han sido facturadas')
+        //else
+        // Commit();
+        // if Mostrar then
+        //     Page.Runmodal(0, SalesHeader);
     end;
 
 
@@ -692,6 +755,76 @@ page 50102 "Mercancía Clientes"
         PurchHeader."Bill-to Name" := Rec."Bill-to Name";
         PurchHeader."VAT Registration No." := Rec."VAT Registration No.";
         PurchHeader."Bill-to Name 2" := Rec."Bill-to Name 2";
+
+    end;
+
+    local procedure FacturarRecepcion(var PurchHeader: Record "Purchase Header"; G: Guid)
+    var
+        PurchLine: Record "Purchase Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        ConfGrupos: Record 252;
+        LineNo: Integer;
+    begin
+        SalesHeader.SetRange("Proceso Facturación", G);
+        SalesHeader.SetRange("Bill-to Customer No.", PurchHeader."Bill-to Customer No.");
+        if not SalesHeader.FindFirst() then begin
+            SalesHeader.Init();
+            SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
+            SalesHeader."Bill-to Customer No." := PurchHeader."Bill-to Customer No.";
+            SalesHeader."Order Date" := PurchHeader."Order Date";
+            SalesHeader.Validate("Order Date", PurchHeader."Order Date");
+            SalesHeader.Insert(true);
+            SalesHeader.Validate("Sell-to Customer No.", PurchHeader."Bill-to Customer No.");
+            SalesHeader.Modify(true);
+            SalesHeader."Proceso Facturación" := G;
+            SalesHeader.Modify(true);
+        end;
+
+        PurchLine.SetRange("Document Type", PurchHeader."Document Type");
+        PurchLine.SetRange("Document No.", PurchHeader."No.");
+        PurchLine.SetFilter("Qty. Rcd. Not Invoiced", '<>%1', 0);
+        if PurchLine.FindSet() then
+            repeat
+                SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                SalesLine.SetRange("Document No.", SalesHeader."No.");
+                SalesLine.SetRange("Description", PurchLine."Description");
+                If not SalesLine.FindSet() then begin
+                    SalesLine.SetRange("Description");
+                    If SalesLine.FindLast() then
+                        LineNo := SalesLine."Line No." + 10000
+                    else
+                        LineNo := 10000;
+                    SalesLine.Init();
+                    SalesLine."Document Type" := SalesHeader."Document Type";
+                    SalesLine."Document No." := SalesHeader."No.";
+                    SalesLine."Line No." := LineNo;
+                    SalesLine."Pedido Compra" := PurchLine."Document No.";
+                    SalesLine."Linea Pedido Compra" := PurchLine."Line No.";
+                    iF PurchLine.Type = PurchLine.TYPE::Item then begin
+                        SalesLine.Type := SalesLine.TYPE::"G/L Account";
+                        ConfGrupos.get(PurchHeader."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                        ConfGrupos.TestField("Sales Account");
+                        SalesLine."No." := ConfGrupos."Sales Account";
+                    end else begin
+                        SalesLine."Type" := PurchLine."Type";
+                        SalesLine."No." := PurchLine."No.";
+                        SalesLine."Variant Code" := PurchLine."Variant Code";
+                    end;
+
+                    SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
+                    SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
+                    SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
+                    SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+                    SalesLine.Description := PurchLine.Description;
+                    SalesLine.Insert(true);
+                end else begin
+                    SalesLine.Validate("Quantity", SalesLine.Quantity + PurchLine."Qty. Rcd. Not Invoiced");
+                    SalesLine."Quantity (Base)" += PurchLine."Qty. Rcd. Not Invoiced (Base)";
+                    SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
+                    SalesLine.Modify();
+                end;
+            until PurchLine.Next() = 0;
 
     end;
 }

@@ -193,6 +193,36 @@ page 50100 "Recepción Mercancía"
             //         Facturar();
             //     end;
             // }
+            action(Release)
+            {
+                ApplicationArea = Suite;
+                Caption = 'Lan&zar';
+                Image = ReleaseDoc;
+                ShortCutKey = 'Ctrl+F9';
+                ToolTip = 'Release the document to the next stage of processing. You must reopen the document before you can make changes to it.';
+
+                trigger OnAction()
+                begin
+                    Rec.PerformManualRelease();
+                    //CurrPage.PurchLines.PAGE.ClearTotalPurchaseHeader();
+                end;
+            }
+            action(Reopen)
+            {
+                ApplicationArea = Suite;
+                Caption = '&Volver abrir';
+                Enabled = Rec.Status <> Rec.Status::Open;
+                Image = ReOpen;
+                ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
+
+                trigger OnAction()
+                var
+                    ReleasePurchDoc: Codeunit "Release Purchase Document";
+                begin
+                    ReleasePurchDoc.PerformManualReopen(Rec);
+                    //CurrPage.PurchLines.PAGE.ClearTotalPurchaseHeader();
+                end;
+            }
             action("&Facturar envio")
             {
                 ApplicationArea = All;
@@ -436,8 +466,8 @@ page 50100 "Recepción Mercancía"
                     SalesLine."Variant Code" := PurchLine."Variant Code";
                 end;
 
-                SalesLine."Quantity" := PurchLine."Cantidad a facturada Uso";
-                SalesLine."Quantity (Base)" := PurchLine."Cantidad a facturar Uso" * PurchLine."Qty. per Unit of Measure";
+                SalesLine."Quantity" := PurchLine."Qty. Rcd. Not Invoiced";
+                SalesLine."Quantity (Base)" := PurchLine."Qty. Rcd. Not Invoiced (Base)";
                 SalesLine."Unit of Measure" := PurchLine."Unit of Measure";
                 SalesLine.vALIDATE("Unit Price", PurchLine."Precio X Producto");
                 SalesLine.Description := PurchLine.Description;
