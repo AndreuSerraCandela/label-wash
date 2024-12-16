@@ -96,10 +96,11 @@ codeunit 50100 EventosTratamientos
 
                     PurchaseLine."Qty. to Receive" := PurchaseLine.Quantity - PurchaseLine."Quantity Received";
                     PurchaseLine."Qty. to Receive (Base)" := PurchaseLine."Quantity (Base)" - PurchaseLine."Qty. Received (Base)";
-                    PurchaseLine."Cantidad Tratada" := PurchaseLine."Cantidad a tratar";
-                    PurchaseLine."Cantidad Tratada Base" := PurchaseLine."Cantidad a tratar Base";
                     PurchaseLine."Cantidad a Tratar" := PurchaseLine."Qty. to Receive";
                     PurchaseLine."Cantidad a Tratar Base" := PurchaseLine."Qty. to Receive (Base)";
+                    PurchaseLine."Cantidad Tratada" := PurchaseLine."Quantity Received";// PurchaseLine."Cantidad a tratar";
+                    PurchaseLine."Cantidad Tratada Base" := PurchaseLine."Qty. Received (Base)";// PurchaseLine."Cantidad a tratar Base";
+
                     PurchaseLine."Cantidad a facturar Tratada" := PurchaseLine."Cantidad a tratar" + PurchaseLine."Cantidad a Merma";
                     //PurchaseLine."Cantidad a Merma" := 0;
                     //PurchaseLine."Cantidad a Merma Base" := 0;
@@ -110,17 +111,19 @@ codeunit 50100 EventosTratamientos
         if PurchaseHeader.Recepcion = Recepcion::Uso then begin
             if PurchaseLine.FindSet() then
                 repeat
-                    PurchaseLine."Quantity Received" := PurchaseLine."Cantidad a Tratar" + PurchaseLine."Cantidad a Merma Uso";
+                    //  PurchaseLine."Quantity Received" := PurchaseLine."Cantidad a Tratar" + PurchaseLine."Cantidad a Merma Uso";
+                    PurchaseLine."Quantity Received" := PurchaseLine."Cantidad a uso";
                     PurchaseLine."Qty. Received (Base)" := PurchaseLine."Quantity Received" * PurchaseLine."Qty. per Unit of Measure";
                     PurchaseLine."Qty. Rcd. Not Invoiced" := PurchaseLine."Quantity Received";
                     PurchaseLine."Qty. Rcd. Not Invoiced (Base)" := PurchaseLine."Qty. Received (Base)";
 
                     PurchaseLine."Qty. to Receive" := PurchaseLine.Quantity - PurchaseLine."Quantity Received";
                     PurchaseLine."Qty. to Receive (Base)" := PurchaseLine."Quantity (Base)" - PurchaseLine."Qty. Received (Base)";
-                    PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad a uso";
-                    PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad a uso Base";
                     PurchaseLine."Cantidad a Uso" := PurchaseLine."Qty. to Receive";
                     PurchaseLine."Cantidad a uso Base" := PurchaseLine."Qty. to Receive (Base)";
+                    PurchaseLine."Cantidad Usada" := PurchaseLine."Quantity Received";//PurchaseLine."Cantidad a uso";
+                    PurchaseLine."Cantidad Usada Base" := PurchaseLine."Qty. Received (Base)";//PurchaseLine."Cantidad a uso Base";
+
                     PurchaseLine."Cantidad a facturar Uso" := PurchaseLine."Cantidad a uso";
                     PurchaseLine.Modify();
                 until PurchaseLine.Next() = 0;
@@ -168,8 +171,6 @@ codeunit 50100 EventosTratamientos
                 PurchaseLine."Cantidad Usada" := PurchaseLine."Cantidad Usada" - (PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced");
                 PurchaseLine."Cantidad Usada Base" := PurchaseLine."Cantidad Usada Base" - (PurchRcptLine."Quantity (Base)" - PurchRcptLine."Qty. Invoiced (Base)");
                 PurchaseLine."Cantidad a facturar Uso" := PurchaseLine."Cantidad a facturar Uso" - UndoQty;
-
-
             end;
     end;
 
