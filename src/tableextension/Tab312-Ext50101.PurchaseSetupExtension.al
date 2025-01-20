@@ -1,4 +1,4 @@
-tableextension 50101 "Purchase Setup Extension" extends "Purchases & Payables Setup"
+tableextension 50101 "Purchase Setup Extension" extends "Purchases & Payables Setup" //312
 {
     fields
     {

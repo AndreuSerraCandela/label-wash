@@ -1,4 +1,4 @@
-pageextension 50100 "Purchase Setup Page Extension" Extends "Purchases & Payables Setup"
+pageextension 50100 "Purchase Setup Page Extension" Extends "Purchases & Payables Setup" //460
 {
     layout
     {

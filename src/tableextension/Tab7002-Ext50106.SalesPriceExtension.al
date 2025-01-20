@@ -1,4 +1,4 @@
-tableextension 50106 SalesPriceExtension extends "Sales Price"
+tableextension 50106 SalesPriceExtension extends "Sales Price" //7002
 {
     fields
     {
