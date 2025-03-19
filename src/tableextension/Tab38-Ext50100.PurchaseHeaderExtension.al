@@ -264,10 +264,38 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
             Caption = 'Contacto';
             TableRelation = Contact;
         }
+        field(50200; "Tipo factura"; Enum "Tipo factura")
+        {
+            DataClassification = ToBeClassified;
+        }
     }
 
+    trigger OnModify()
+    var
+        TLableError: Label 'No esta permitido modificar la factura con tipo de factura %1';
+    begin
+        if rec."Document Type" = Rec."Document Type"::Invoice then
+            if NOT (xRec."Tipo factura" = xrec."Tipo factura"::" ") then begin
+                IF (REC."Tipo factura" = rec."Tipo factura"::" ") and (xRec."Tipo factura" = "Tipo factura"::Proforma) then
+                    Error(TLableError, Rec."Tipo factura");
+                if (rec."Tipo factura" = rec."Tipo factura"::Proforma) then begin
+                    Error(TLableError, Rec."Tipo factura");
+                end;
+            end;
+    end;
+
+    trigger OnDelete()
+    var
+        TLableError: Label 'No esta permitido borrar la factura con tipo de factura %1';
+    begin
+        if rec."Document Type" = Rec."Document Type"::Invoice then
+            if rec."Tipo factura" = "Tipo factura"::Proforma then
+                Error(TLableError, Rec."Tipo factura");
+    end;
 
     local procedure GetCust(BilltoCustomerNo: Code[20])
+    var
+        hisfact: Record "Purch. Inv. Header";
     begin
         Cust.Get(BilltoCustomerNo);
     end;

@@ -8,7 +8,7 @@
             "type": "al",
             "environmentType": "Sandbox",
             "tenant": "bf927470-9155-475f-b9ab-b34833843bcf",
-            "environmentName": "ZZ_DIC24_AVIACTION",
+            "environmentName": "ZZ_ENE25_AVIACTION",
             "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": "All",
