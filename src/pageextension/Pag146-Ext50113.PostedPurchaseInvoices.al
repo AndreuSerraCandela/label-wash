@@ -2,6 +2,15 @@ pageextension 50113 "Posted Purchase Invoices" extends "Posted Purchase Invoices
 {
     layout
     {
+        addafter("Vendor Invoice No.")
+        {
+
+            field("Vendor Order No."; Rec."Vendor Order No.")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Specifies the vendor''s order number.';
+            }
+        }
         addafter("Posting Date")
         {
 
