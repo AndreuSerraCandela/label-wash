@@ -1335,7 +1335,8 @@ Report 50100 "Notas Recepcion Servitec"
 
     PROCEDURE InitLogInteraction();
     BEGIN
-        LogInteraction := SegManagement.FindInteractTmplCode(4) <> '';
+        //  LogInteraction := SegManagement.FindInteractTmplCode(4) <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Rcpt.") <> '';
     END;
 
     PROCEDURE FindPostedShipmentDate(): Date;
