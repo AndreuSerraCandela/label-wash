@@ -1,21 +1,18 @@
-pageextension 50116 VendorList extends "Vendor List" //27
+pageextension 50121 VendorCard extends "Vendor Card" //26
 {
     layout
     {
-        addafter(Name)
+        addafter("Balance (LCY)")
         {
+
+
             field(Temporal; Rec.Temporal)
             {
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Temporales field.', Comment = '%';
             }
-
-            field("VAT Registration No."; Rec."VAT Registration No.")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the vendor''s VAT registration number.';
-            }
         }
+
     }
 
     actions
