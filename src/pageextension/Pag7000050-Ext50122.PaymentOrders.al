@@ -9,6 +9,11 @@ pageextension 50122 DocsinPOSubform extends "Docs. in PO Subform" //7000075
                 ApplicationArea = all;
                 Editable = false;
             }
+            field(NoDocExterno; NoDocExterno)
+            {
+                ApplicationArea = all;
+                Editable = false;
+            }
 
         }
         modify("Account No.")
@@ -53,7 +58,7 @@ pageextension 50122 DocsinPOSubform extends "Docs. in PO Subform" //7000075
         NombreClieProveedor: Text[100];
         Clie: Record Customer;
         Provee: Record Vendor;
-        NoDocExterno: Code[20];
+        NoDocExterno: Code[35];
         Rec25: Record "Vendor Ledger Entry";
         Rec21: Record "Cust. Ledger Entry";
 }
