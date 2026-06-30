@@ -2,6 +2,25 @@ pageextension 50117 GeneralJournal extends "General Journal" //39
 {
     layout
     {
+        modify("Document Type")
+        {
+            Visible = true;
+            ApplicationArea = All;
+        }
+        addafter("Document No.")
+        {
+            field("Payment Method Code"; Rec."Payment Method Code")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Especifica la forma de pago de la línea de diario.';
+            }
+        }
+        modify("Bill No.")
+        {
+            Visible = true;
+            ApplicationArea = All;
+            ToolTip = 'Especifica el número del efecto.';
+        }
         addafter(Description)
         {
 
