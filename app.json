@@ -2,7 +2,7 @@
   "id": "8f935ffe-e72d-4ab4-8556-725753c8bb2b",
   "name": "AVIACTION",
   "publisher": "MaybeCloud",
-  "version": "1.0.1.23",
+  "version": "1.0.1.25",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -25,7 +25,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "runtime": "16.0",
+  "runtime": "16.1",
   "features": [
     "NoImplicitWith"
   ]
