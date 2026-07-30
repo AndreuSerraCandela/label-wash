@@ -644,4 +644,292 @@ codeunit 50102 EventosVarios
             exit(ReminderFinChargeEntry."Reminder Level");
         exit(0);
     end;
+
+
+    procedure ExportarFormato1PaymentOrder(var PaymentOrder: Record "Payment Order")
+    begin
+        PaymentOrder.TestField("No.");
+        ExportarFormato1(PaymentOrder."No.", PaymentOrder."Posting Date", PaymentOrder."No.", "Cartera Document Type"::Payable);
+    end;
+
+    procedure ExportarFormato2PaymentOrder(var PaymentOrder: Record "Payment Order")
+    begin
+        PaymentOrder.TestField("No.");
+        ExportarFormato2(PaymentOrder."No.", PaymentOrder."Posting Date", PaymentOrder."No.", "Cartera Document Type"::Payable);
+    end;
+
+    local procedure ExportarFormato1(HeaderNo: Code[20]; PostingDate: Date; FileLabel: Code[20]; CarteraType: Enum "Cartera Document Type")
+    var
+        ExcelBuffer: Record "Excel Buffer" temporary;
+        CarteraDoc: Record "Cartera Doc.";
+        RowNo: Integer;
+    begin
+        RowNo := 1;
+        AddTextCell(ExcelBuffer, RowNo, 1, 'ALIAS', true);
+        AddTextCell(ExcelBuffer, RowNo, 2, 'IMPORTE', true);
+        AddTextCell(ExcelBuffer, RowNo, 3, 'CONCEPTO', true);
+        AddTextCell(ExcelBuffer, RowNo, 4, 'NOMBRE', true);
+        AddTextCell(ExcelBuffer, RowNo, 5, 'BIC/SWIFT', true);
+        AddTextCell(ExcelBuffer, RowNo, 6, 'TIPO TRANSFERENCIA', true);
+        AddTextCell(ExcelBuffer, RowNo, 7, 'DIVISA', true);
+        AddTextCell(ExcelBuffer, RowNo, 8, 'GASTOS', true);
+        AddTextCell(ExcelBuffer, RowNo, 9, 'CUENTA DESTINO (IBAN)', true);
+
+        if not FindCarteraDocuments(CarteraDoc, HeaderNo, CarteraType) then
+            Error(SinDocumentosErr, HeaderNo);
+
+        repeat
+            RowNo += 1;
+            AddLineFormato1(ExcelBuffer, CarteraDoc, RowNo);
+        until CarteraDoc.Next() = 0;
+
+        DownloadExcel(ExcelBuffer, StrSubstNo('Remesa Divisa_1 %1', FormatFileDate(PostingDate, FileLabel)));
+    end;
+
+    local procedure ExportarFormato2(HeaderNo: Code[20]; PostingDate: Date; FileLabel: Code[20]; CarteraType: Enum "Cartera Document Type")
+    var
+        ExcelBuffer: Record "Excel Buffer" temporary;
+        CarteraDoc: Record "Cartera Doc.";
+        RowNo: Integer;
+    begin
+        RowNo := 1;
+        AddTextCell(ExcelBuffer, RowNo, 1, 'ALIAS', true);
+        AddTextCell(ExcelBuffer, RowNo, 2, 'NOMBRE BENEFICIARIO', true);
+        AddTextCell(ExcelBuffer, RowNo, 3, 'IBAN', true);
+        AddTextCell(ExcelBuffer, RowNo, 4, 'DIRECCIÓN BENEFICIARIO', true);
+        AddTextCell(ExcelBuffer, RowNo, 5, 'PROVINCIA', true);
+        AddTextCell(ExcelBuffer, RowNo, 6, 'CÓDIGO POSTAL', true);
+        AddTextCell(ExcelBuffer, RowNo, 7, 'PAÍS BENEFICIARIO', true);
+        AddTextCell(ExcelBuffer, RowNo, 8, 'IMPORTE', true);
+        AddTextCell(ExcelBuffer, RowNo, 9, 'GASTOS', true);
+        AddTextCell(ExcelBuffer, RowNo, 10, 'Tipo Transferencia', true);
+        AddTextCell(ExcelBuffer, RowNo, 11, 'RESIDENTE', true);
+        AddTextCell(ExcelBuffer, RowNo, 12, 'SWIFT', true);
+        AddTextCell(ExcelBuffer, RowNo, 13, 'DIVISA', true);
+
+        if not FindCarteraDocuments(CarteraDoc, HeaderNo, CarteraType) then
+            Error(SinDocumentosErr, HeaderNo);
+
+        repeat
+            RowNo += 1;
+            AddLineFormato2(ExcelBuffer, CarteraDoc, RowNo);
+        until CarteraDoc.Next() = 0;
+
+        DownloadExcel(ExcelBuffer, StrSubstNo('Remesa Divisa_2 %1', FormatFileDate(PostingDate, FileLabel)));
+    end;
+
+    local procedure FindCarteraDocuments(var CarteraDoc: Record "Cartera Doc."; HeaderNo: Code[20]; CarteraType: Enum "Cartera Document Type"): Boolean
+    begin
+        CarteraDoc.Reset();
+        CarteraDoc.SetRange(Type, CarteraType);
+        CarteraDoc.SetRange("Collection Agent", CarteraDoc."Collection Agent"::Bank);
+        CarteraDoc.SetRange("Bill Gr./Pmt. Order No.", HeaderNo);
+        exit(CarteraDoc.FindSet());
+    end;
+
+    local procedure AddLineFormato1(var ExcelBuffer: Record "Excel Buffer" temporary; CarteraDoc: Record "Cartera Doc."; RowNo: Integer)
+    var
+        PartnerLine: Record "Partner Remesa Divisa" temporary;
+        Setup: Record "General Ledger Setup";
+    begin
+        LoadPartnerLine(CarteraDoc, PartnerLine);
+        GetSetup(Setup);
+
+        AddTextCell(ExcelBuffer, RowNo, 1, PartnerLine.Alias, false);
+        AddNumberCell(ExcelBuffer, RowNo, 2, CarteraDoc."Remaining Amount");
+        AddTextCell(ExcelBuffer, RowNo, 3, GetConcepto(CarteraDoc), false);
+        AddTextCell(ExcelBuffer, RowNo, 4, PartnerLine.Name, false);
+        AddTextCell(ExcelBuffer, RowNo, 5, PartnerLine."SWIFT Code", false);
+        AddTextCell(ExcelBuffer, RowNo, 6, Setup."Tipo transfer. remesa divisa", false);
+        AddTextCell(ExcelBuffer, RowNo, 7, GetCurrencyCode(CarteraDoc), false);
+        AddIntegerCell(ExcelBuffer, RowNo, 8, Setup."Gastos remesa divisa");
+        AddTextCell(ExcelBuffer, RowNo, 9, PartnerLine.IBAN, false);
+    end;
+
+    local procedure AddLineFormato2(var ExcelBuffer: Record "Excel Buffer" temporary; CarteraDoc: Record "Cartera Doc."; RowNo: Integer)
+    var
+        PartnerLine: Record "Partner Remesa Divisa" temporary;
+        Setup: Record "General Ledger Setup";
+    begin
+        LoadPartnerLine(CarteraDoc, PartnerLine);
+        GetSetup(Setup);
+
+        AddTextCell(ExcelBuffer, RowNo, 1, PartnerLine.Alias, false);
+        AddTextCell(ExcelBuffer, RowNo, 2, PartnerLine.Name, false);
+        AddTextCell(ExcelBuffer, RowNo, 3, PartnerLine.IBAN, false);
+        AddTextCell(ExcelBuffer, RowNo, 4, PartnerLine.Address, false);
+        AddTextCell(ExcelBuffer, RowNo, 5, PartnerLine.County, false);
+        AddTextCell(ExcelBuffer, RowNo, 6, PartnerLine."Post Code", false);
+        AddTextCell(ExcelBuffer, RowNo, 7, PartnerLine."Country/Region Code", false);
+        AddNumberCell(ExcelBuffer, RowNo, 8, CarteraDoc."Remaining Amount");
+        AddIntegerCell(ExcelBuffer, RowNo, 9, Setup."Gastos remesa divisa");
+        AddTextCell(ExcelBuffer, RowNo, 10, Setup."Tipo transfer. remesa divisa", false);
+        AddTextCell(ExcelBuffer, RowNo, 11, Setup."Residente remesa divisa", false);
+        AddTextCell(ExcelBuffer, RowNo, 12, PartnerLine."SWIFT Code", false);
+        AddTextCell(ExcelBuffer, RowNo, 13, GetCurrencyCode(CarteraDoc), false);
+    end;
+
+    local procedure LoadPartnerLine(CarteraDoc: Record "Cartera Doc."; var PartnerLine: Record "Partner Remesa Divisa" temporary)
+    var
+        Vendor: Record Vendor;
+        VendorBankAccount: Record "Vendor Bank Account";
+
+    begin
+        PartnerLine.Init();
+        PartnerLine."Entry No." := CarteraDoc."Entry No.";
+
+        Vendor.Get(CarteraDoc."Account No.");
+        PartnerLine.Alias := GetVendorAlias(Vendor);
+        PartnerLine.Name := Vendor.Name;
+        PartnerLine.Address := BuildAddress(Vendor.Address, Vendor."Address 2", Vendor.City);
+        PartnerLine.County := Vendor.County;
+        PartnerLine."Post Code" := Vendor."Post Code";
+        PartnerLine."Country/Region Code" := Vendor."Country/Region Code";
+        GetVendorBankAccount(CarteraDoc, VendorBankAccount);
+        PartnerLine.IBAN := GetBankAccountNo(VendorBankAccount.IBAN, VendorBankAccount."Bank Account No.");
+        PartnerLine."SWIFT Code" := VendorBankAccount."SWIFT Code";
+
+        PartnerLine.Insert();
+    end;
+
+    local procedure GetVendorAlias(Vendor: Record Vendor): Code[20]
+    begin
+        if Vendor."Alias remesa divisa" <> '' then
+            exit(Vendor."Alias remesa divisa");
+
+        if Vendor."Search Name" <> '' then
+            exit(CopyStr(Vendor."Search Name", 1, MaxStrLen(Vendor."Alias remesa divisa")));
+
+        exit(CopyStr(Vendor.Name, 1, MaxStrLen(Vendor."Alias remesa divisa")));
+    end;
+
+
+    local procedure GetVendorBankAccount(CarteraDoc: Record "Cartera Doc."; var VendorBankAccount: Record "Vendor Bank Account")
+    begin
+        VendorBankAccount.SetRange("Vendor No.", CarteraDoc."Account No.");
+        if CarteraDoc."Cust./Vendor Bank Acc. Code" <> '' then
+            VendorBankAccount.SetRange(Code, CarteraDoc."Cust./Vendor Bank Acc. Code")
+        else
+            VendorBankAccount.SetRange("Use For Electronic Payments", true);
+
+        if not VendorBankAccount.FindFirst() then begin
+            VendorBankAccount.SetRange("Use For Electronic Payments");
+            if not VendorBankAccount.FindFirst() then
+                Error(SinCuentaBancariaErr, CarteraDoc."Account No.");
+        end;
+    end;
+
+
+
+    local procedure GetBankAccountNo(IBAN: Code[50]; BankAccountNo: Text[30]): Text[50]
+    begin
+        if IBAN <> '' then
+            exit(DelChr(IBAN, '=', ' '));
+
+        exit(BankAccountNo);
+    end;
+
+    local procedure BuildAddress(Address: Text[100]; Address2: Text[50]; City: Text[30]): Text[250]
+    var
+        Result: Text;
+    begin
+        Result := DelChr(Address, '<>', ' ');
+        if Address2 <> '' then
+            if Result <> '' then
+                Result += ', ' + Address2
+            else
+                Result := Address2;
+        if City <> '' then
+            if Result <> '' then
+                Result += ', ' + City
+            else
+                Result := City;
+
+        exit(CopyStr(Result, 1, 250));
+    end;
+
+    local procedure GetConcepto(CarteraDoc: Record "Cartera Doc."): Text[250]
+    var
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+
+    begin
+        if VendorLedgerEntry.Get(CarteraDoc."Entry No.") then
+            if VendorLedgerEntry."External Document No." <> '' then
+                exit(VendorLedgerEntry."External Document No.");
+
+        exit(CarteraDoc."Document No.");
+    end;
+
+    local procedure GetCurrencyCode(CarteraDoc: Record "Cartera Doc."): Code[10]
+    begin
+        if CarteraDoc."Currency Code" <> '' then
+            exit(CarteraDoc."Currency Code");
+
+        exit('');
+    end;
+
+    local procedure GetSetup(var GeneralLedgerSetup: Record "General Ledger Setup")
+    begin
+        if not GeneralLedgerSetup.Get() then
+            GeneralLedgerSetup.Init();
+
+        if GeneralLedgerSetup."Tipo transfer. remesa divisa" = '' then
+            GeneralLedgerSetup."Tipo transfer. remesa divisa" := 'OTRA';
+        if GeneralLedgerSetup."Residente remesa divisa" = '' then
+            GeneralLedgerSetup."Residente remesa divisa" := 'N';
+        if GeneralLedgerSetup."Gastos remesa divisa" = 0 then
+            GeneralLedgerSetup."Gastos remesa divisa" := 3;
+    end;
+
+    local procedure AddTextCell(var ExcelBuffer: Record "Excel Buffer" temporary; RowNo: Integer; ColNo: Integer; Value: Text; Bold: Boolean)
+    begin
+        ExcelBuffer.Init();
+        ExcelBuffer.Validate("Row No.", RowNo);
+        ExcelBuffer.Validate("Column No.", ColNo);
+        ExcelBuffer."Cell Value as Text" := CopyStr(Value, 1, MaxStrLen(ExcelBuffer."Cell Value as Text"));
+        ExcelBuffer."Cell Type" := ExcelBuffer."Cell Type"::Text;
+        ExcelBuffer.Bold := Bold;
+        ExcelBuffer.Insert();
+    end;
+
+    local procedure AddNumberCell(var ExcelBuffer: Record "Excel Buffer" temporary; RowNo: Integer; ColNo: Integer; Value: Decimal)
+    begin
+        ExcelBuffer.Init();
+        ExcelBuffer.Validate("Row No.", RowNo);
+        ExcelBuffer.Validate("Column No.", ColNo);
+        ExcelBuffer."Cell Value as Text" := Format(Value, 0, '<Precision,2:8><Standard Format,0>');
+        ExcelBuffer."Cell Type" := ExcelBuffer."Cell Type"::Number;
+        ExcelBuffer.Insert();
+    end;
+
+    local procedure AddIntegerCell(var ExcelBuffer: Record "Excel Buffer" temporary; RowNo: Integer; ColNo: Integer; Value: Integer)
+    begin
+        ExcelBuffer.Init();
+        ExcelBuffer.Validate("Row No.", RowNo);
+        ExcelBuffer.Validate("Column No.", ColNo);
+        ExcelBuffer."Cell Value as Text" := Format(Value);
+        ExcelBuffer."Cell Type" := ExcelBuffer."Cell Type"::Number;
+        ExcelBuffer.Insert();
+    end;
+
+    local procedure DownloadExcel(var ExcelBuffer: Record "Excel Buffer" temporary; FriendlyName: Text)
+    begin
+        ExcelBuffer.CreateNewBook('Remesa Divisa');
+        ExcelBuffer.WriteSheet('Remesa Divisa', CompanyName, UserId);
+        ExcelBuffer.CloseBook();
+        ExcelBuffer.SetFriendlyFilename(FriendlyName);
+        ExcelBuffer.OpenExcel();
+    end;
+
+    local procedure FormatFileDate(PostingDate: Date; HeaderNo: Code[20]): Text
+    begin
+        if PostingDate <> 0D then
+            exit(Format(PostingDate, 0, '<Day,2>.<Month,2>.<Year4>'));
+
+        exit(HeaderNo);
+    end;
+
+    var
+        SinDocumentosErr: Label 'No hay documentos de cartera asociados al número %1.';
+        SinCuentaBancariaErr: Label 'No se ha encontrado cuenta bancaria para la cuenta %1.';
 }

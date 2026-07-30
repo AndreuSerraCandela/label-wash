@@ -39,6 +39,23 @@ pageextension 50127 GeneralLedgerSetupPageExt extends "General Ledger Setup"
                     ToolTip = 'Si se activa, no se añade ninguna descripción al apunte de retrocesión.';
                 }
             }
+            group(RemesaDivisa)
+            {
+                Caption = 'Remesa divisa';
+
+                field("Gastos remesa divisa"; Rec."Gastos remesa divisa")
+                {
+                    ApplicationArea = All;
+                }
+                field("Tipo transfer. remesa divisa"; Rec."Tipo transfer. remesa divisa")
+                {
+                    ApplicationArea = All;
+                }
+                field("Residente remesa divisa"; Rec."Residente remesa divisa")
+                {
+                    ApplicationArea = All;
+                }
+            }
         }
     }
 }

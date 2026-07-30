@@ -48,6 +48,28 @@ tableextension 50126 GeneralLedgerSetupExt extends "General Ledger Setup"
             TableRelation = "No. Series";
             ToolTip = 'Serie de documentos para el apunte de retrocesión.';
         }
+        field(50106; "Gastos remesa divisa"; Integer)
+        {
+            Caption = 'Gastos remesa divisa';
+            DataClassification = ToBeClassified;
+            InitValue = 3;
+            MinValue = 0;
+            ToolTip = 'Valor del campo Gastos en los ficheros de remesa en divisa.';
+        }
+        field(50107; "Tipo transfer. remesa divisa"; Code[10])
+        {
+            Caption = 'Tipo transferencia remesa divisa';
+            DataClassification = ToBeClassified;
+            InitValue = 'OTRA';
+            ToolTip = 'Valor del campo Tipo transferencia en los ficheros de remesa en divisa.';
+        }
+        field(50108; "Residente remesa divisa"; Code[1])
+        {
+            Caption = 'Residente remesa divisa';
+            DataClassification = ToBeClassified;
+            InitValue = 'N';
+            ToolTip = 'Valor del campo Residente en el formato ampliado de remesa en divisa.';
+        }
 
     }
 }

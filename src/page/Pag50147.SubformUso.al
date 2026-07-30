@@ -1034,7 +1034,7 @@ page 50147 "Subform Uso"
                         EditinExcel: Codeunit "Edit in Excel";
                         EditinExcelFilters: Codeunit "Edit in Excel Filters";
                     begin
-                        EditinExcelFilters.AddField('Document_No', Enum::"Edit in Excel Filter Type"::Equal, Rec."Document No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddFieldV2('Document_No', Enum::"Edit in Excel Filter Type"::Equal, Rec."Document No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
 
                         EditinExcel.EditPageInExcel(
                             'Purchase_Order_Line',
@@ -1264,7 +1264,7 @@ page 50147 "Subform Uso"
     var
         TrackingForm: Page "Order Tracking";
     begin
-        TrackingForm.SetPurchLine(Rec);
+        TrackingForm.SetVariantRec(Rec, Rec."No.", Rec."Outstanding Qty. (Base)", rec."Expected Receipt Date", Rec."Expected Receipt Date");
         TrackingForm.RunModal();
     end;
 

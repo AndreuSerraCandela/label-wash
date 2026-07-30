@@ -17,18 +17,11 @@ tableextension 50125 Vendor extends Vendor //23
             FieldClass = FlowField;
 
         }
+        field(50101; "Alias remesa divisa"; Code[20])
+        {
+            Caption = 'Alias remesa divisa';
+            DataClassification = ToBeClassified;
+            ToolTip = 'Alias corto del proveedor para ficheros de remesa en divisa.';
+        }
     }
-
-    keys
-    {
-        // Add changes to keys here
-    }
-
-    fieldgroups
-    {
-        // Add changes to field groups here
-    }
-
-    var
-        myInt: Integer;
 }

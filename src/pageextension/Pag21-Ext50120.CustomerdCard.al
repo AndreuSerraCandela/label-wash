@@ -11,6 +11,11 @@ pageextension 50120 CustomerdCard extends "Customer Card" //21
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Temporales field.', Comment = '%';
             }
+            field("Alias remesa divisa"; Rec."Alias remesa divisa")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Alias corto usado en los ficheros de remesa en divisa.';
+            }
         }
     }
 

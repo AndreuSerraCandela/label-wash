@@ -17,18 +17,11 @@ tableextension 50124 Customer extends Customer //18
             FieldClass = FlowField;
 
         }
+        field(50101; "Alias remesa divisa"; Code[20])
+        {
+            Caption = 'Alias remesa divisa';
+            DataClassification = ToBeClassified;
+            ToolTip = 'Alias corto del cliente para ficheros de remesa en divisa.';
+        }
     }
-
-    keys
-    {
-        // Add changes to keys here
-    }
-
-    fieldgroups
-    {
-        // Add changes to field groups here
-    }
-
-    var
-        myInt: Integer;
 }
