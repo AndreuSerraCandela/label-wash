@@ -1,4 +1,4 @@
-enum 50102 Recepcion
+enum 60102 Recepcion
 {
     value(0; " ")
     {

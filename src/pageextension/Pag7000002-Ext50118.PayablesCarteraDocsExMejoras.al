@@ -1,4 +1,4 @@
-pageextension 50118 "PayablesCarteraDocsExMejoras" extends "Payables Cartera Docs" //7000002
+pageextension 60118 "PayablesCarteraDocsExMejoras" extends "Payables Cartera Docs" //7000002
 {
     layout
     {

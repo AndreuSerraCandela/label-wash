@@ -1,5 +1,5 @@
 
-page 50145 "Lineas Recepcion"
+page 60145 "Lineas Recepcion"
 {
     AutoSplitKey = true;
     Caption = 'Lines';

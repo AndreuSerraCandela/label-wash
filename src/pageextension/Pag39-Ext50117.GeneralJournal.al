@@ -1,4 +1,4 @@
-pageextension 50117 GeneralJournal extends "General Journal" //39
+pageextension 60117 GeneralJournal extends "General Journal" //39
 {
     layout
     {

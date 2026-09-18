@@ -1,4 +1,4 @@
-pageextension 50110 PostedSalesInvSubform extends "Posted Sales Invoice Subform" //133
+pageextension 60110 PostedSalesInvSubform extends "Posted Sales Invoice Subform" //133
 {
     layout
     {

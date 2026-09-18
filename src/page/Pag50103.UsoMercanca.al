@@ -1,4 +1,4 @@
-page 50103 "Uso Mercancía"
+page 60103 "Uso Mercancía"
 {
     PageType = Card;
     Permissions = tabledata "Purch. Rcpt. Line" = rimd;

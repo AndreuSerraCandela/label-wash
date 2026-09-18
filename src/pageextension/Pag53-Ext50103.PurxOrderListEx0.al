@@ -1,4 +1,4 @@
-pageextension 50103 PurxOrderListEx0 extends "Purchase List" //53
+pageextension 60103 PurxOrderListEx0 extends "Purchase List" //53
 {
     trigger OnOpenPage()
     begin

@@ -1,4 +1,4 @@
-pageextension 50101 SalesPriceExt extends "Sales Prices" //7002
+pageextension 60101 SalesPriceExt extends "Sales Prices" //7002
 {
     layout
     {

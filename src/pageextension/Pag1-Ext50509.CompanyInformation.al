@@ -1,7 +1,7 @@
 /// <summary>
 /// PageExtension CompanyInformationServitec (ID 50509) extends Page Company Information.
 /// </summary>
-pageextension 50129 CompanyInformationServitec extends "Company Information"
+pageextension 60129 CompanyInformationServitec extends "Company Information"
 {
     layout
     {

@@ -1,4 +1,4 @@
-enum 50103 "Tipo factura"
+enum 60103 "Tipo factura"
 {
     Extensible = true;
 

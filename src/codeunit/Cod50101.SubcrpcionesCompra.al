@@ -1,4 +1,4 @@
-codeunit 50101 SubcrpcionesCompra
+codeunit 60101 SubcrpcionesCompra
 {
     trigger OnRun()
     begin

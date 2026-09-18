@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Reminder Diagnosis (ID 90144).
 /// </summary>
-page 50124 "Reminder Diagnosis"
+page 60124 "Reminder Diagnosis"
 {
     ApplicationArea = All;
     Caption = 'Diagnóstico recordatorios';

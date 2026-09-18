@@ -1,7 +1,7 @@
 /// <summary>
 /// TableExtension ReminderLevel (ID 90141) extends Record Reminder Level.
 /// </summary>
-tableextension 50141 ReminderLevel extends "Reminder Level"
+tableextension 60141 ReminderLevel extends "Reminder Level"
 {
     fields
     {

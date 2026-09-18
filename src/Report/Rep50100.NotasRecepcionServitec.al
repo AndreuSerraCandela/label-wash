@@ -1,7 +1,7 @@
 /// <summary>
-/// Report Sales - Invoice Servitec (ID 50000).
+/// Report Sales - Invoice Servitec (ID 60100).
 /// </summary>
-Report 50100 "Notas Recepcion Servitec"
+Report 60100 "Notas Recepcion Servitec"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './src/report/layout/NotaRecepcion.rdlc';

@@ -1,4 +1,4 @@
-tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
+tableextension 60100 PurchaseHeaderExtension extends "Purchase Header" //38
 {
     fields
     {
@@ -27,8 +27,8 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
             end;
         }
 
-        field(50000; Recepcion; Enum Recepcion) { }
-        field(50104; "Bill-to Customer No."; Code[20])
+        field(60100; Recepcion; Enum Recepcion) { }
+        field(60104; "Bill-to Customer No."; Code[20])
         {
             Caption = 'Cód Cliente';
             NotBlank = true;
@@ -71,7 +71,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
 
             end;
         }
-        field(50015; "Bill-to Name"; Text[100])
+        field(60115; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
             TableRelation = Customer.Name;
@@ -98,23 +98,23 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
                 Validate("Bill-to Customer No.", Customer.GetCustNo("Bill-to Name"));
             end;
         }
-        field(50016; "Bill-to Name 2"; Text[50])
+        field(60116; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
         }
-        field(50017; "Bill-to Address"; Text[100])
+        field(60117; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
 
 
         }
-        field(50018; "Bill-to Address 2"; Text[50])
+        field(60118; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
 
 
         }
-        field(50019; "Bill-to City"; Text[30])
+        field(60119; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
             TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
@@ -139,7 +139,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
 
             end;
         }
-        field(50110; "Bill-to Contact"; Text[100])
+        field(60110; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
 
@@ -156,7 +156,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
 
 
         }
-        field(50053; "Bill-to Contact No."; Code[20])
+        field(60153; "Bill-to Contact No."; Code[20])
         {
             Caption = 'Bill-to Contact No.';
             TableRelation = Contact;
@@ -213,7 +213,7 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
                 UpdateBillToCust("Bill-to Contact No.");
             end;
         }
-        field(50185; "Bill-to Post Code"; Code[20])
+        field(60185; "Bill-to Post Code"; Code[20])
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
@@ -234,14 +234,14 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
 
             end;
         }
-        field(50186; "Bill-to County"; Text[30])
+        field(60186; "Bill-to County"; Text[30])
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
 
 
         }
-        field(50187; "Bill-to Country/Region Code"; Code[10])
+        field(60187; "Bill-to Country/Region Code"; Code[10])
         {
             Caption = 'Bill-to Country/Region Code';
             TableRelation = "Country/Region";
@@ -255,16 +255,16 @@ tableextension 50100 PurchaseHeaderExtension extends "Purchase Header" //38
 
             end;
         }
-        field(50188; "Bill-to Phone No."; Text[30])
+        field(60188; "Bill-to Phone No."; Text[30])
         {
             Caption = 'Teléfono';
         }
-        field(50189; "Bill-to E-Mail"; Text[80])
+        field(60189; "Bill-to E-Mail"; Text[80])
         {
             Caption = 'Contacto';
             TableRelation = Contact;
         }
-        field(50200; "Tipo factura"; Enum "Tipo factura")
+        field(60190; "Tipo factura"; Enum "Tipo factura")
         {
             DataClassification = ToBeClassified;
         }

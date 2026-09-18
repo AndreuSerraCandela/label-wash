@@ -1,4 +1,4 @@
-codeunit 50102 EventosVarios
+codeunit 60102 EventosVarios
 {
     Permissions = tableData "G/L Entry" = RIMD,
      tabledata "Cust. Ledger Entry" = rm,
@@ -927,6 +927,366 @@ codeunit 50102 EventosVarios
             exit(Format(PostingDate, 0, '<Day,2>.<Month,2>.<Year4>'));
 
         exit(HeaderNo);
+    end;
+
+    procedure GetCustomerPeriodBalanceLCY(
+        CustomerNo: Code[20];
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text): Decimal
+    var
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+    begin
+        if (CustomerNo = '') or (DimensionCode = '') or (DimensionValueCode = '') then
+            exit(0);
+
+        SetCustomerPeriodBalanceFilters(
+            DetailedCustLedgEntry, CustomerNo, DimensionCode, DimensionValueCode,
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        DetailedCustLedgEntry.CalcSums("Amount (LCY)");
+        exit(DetailedCustLedgEntry."Amount (LCY)");
+    end;
+
+    procedure GetCustomerPeriodBalanceTotalLCY(
+        CustomerNo: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text): Decimal
+    var
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+    begin
+        if CustomerNo = '' then
+            exit(0);
+
+        SetCustomerPeriodBalanceFilters(
+            DetailedCustLedgEntry, CustomerNo, '', '',
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        DetailedCustLedgEntry.CalcSums("Amount (LCY)");
+        exit(DetailedCustLedgEntry."Amount (LCY)");
+    end;
+
+    procedure DrillDownCustomerPeriodBalance(
+        CustomerNo: Code[20];
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text)
+    var
+        CustLedgEntry: Record "Cust. Ledger Entry";
+    begin
+        if CustomerNo = '' then
+            exit;
+
+        SetCustomerLedgerEntryFilters(
+            CustLedgEntry, CustomerNo, DimensionCode, DimensionValueCode,
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        PAGE.Run(PAGE::"Customer Ledger Entries", CustLedgEntry);
+    end;
+
+    local procedure SetCustomerLedgerEntryFilters(
+        var CustLedgEntry: Record "Cust. Ledger Entry";
+        CustomerNo: Code[20];
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        CustLedgEntry.Reset();
+        CustLedgEntry.SetRange("Customer No.", CustomerNo);
+        ApplyCustomerMatrixTotalsFiltersToCLE(CustLedgEntry, DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+
+        if (DimensionCode = '') or (DimensionValueCode = '') then
+            exit;
+
+        GeneralLedgerSetup.Get();
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 1, GeneralLedgerSetup) then begin
+            CustLedgEntry.SetRange("Global Dimension 1 Code", DimensionValueCode);
+            exit;
+        end;
+
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 2, GeneralLedgerSetup) then begin
+            CustLedgEntry.SetRange("Global Dimension 2 Code", DimensionValueCode);
+            exit;
+        end;
+
+        SetCustomerMatrixColumnDimFilter(CustLedgEntry, DimensionCode, DimensionValueCode, GeneralLedgerSetup);
+    end;
+
+    local procedure SetCustomerPeriodBalanceFilters(
+        var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        CustomerNo: Code[20];
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text)
+    var
+        CustLedgEntry: Record "Cust. Ledger Entry";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        EntryNoFilter: Text;
+    begin
+        DetailedCustLedgEntry.Reset();
+        DetailedCustLedgEntry.SetRange("Customer No.", CustomerNo);
+        ApplyCustomerMatrixTotalsFilters(DetailedCustLedgEntry, DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+
+        if (DimensionCode = '') or (DimensionValueCode = '') then
+            exit;
+
+        GeneralLedgerSetup.Get();
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 1, GeneralLedgerSetup) then begin
+            DetailedCustLedgEntry.SetRange("Initial Entry Global Dim. 1", DimensionValueCode);
+            exit;
+        end;
+
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 2, GeneralLedgerSetup) then begin
+            DetailedCustLedgEntry.SetRange("Initial Entry Global Dim. 2", DimensionValueCode);
+            exit;
+        end;
+
+        CustLedgEntry.Reset();
+        CustLedgEntry.SetRange("Customer No.", CustomerNo);
+        SetCustomerMatrixColumnDimFilter(CustLedgEntry, DimensionCode, DimensionValueCode, GeneralLedgerSetup);
+        if CustLedgEntry.FindSet() then
+            repeat
+                EntryNoFilter := AppendIntegerToFilter(EntryNoFilter, CustLedgEntry."Entry No.");
+            until CustLedgEntry.Next() = 0
+        else
+            EntryNoFilter := '0';
+
+        DetailedCustLedgEntry.SetFilter("Cust. Ledger Entry No.", EntryNoFilter);
+    end;
+
+    local procedure ApplyCustomerMatrixTotalsFilters(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; DateFilter: Text; GlobalDim1Filter: Text; GlobalDim2Filter: Text; CurrencyFilter: Text)
+    begin
+        if DateFilter <> '' then
+            DetailedCustLedgEntry.SetFilter("Posting Date", DateFilter);
+        if GlobalDim1Filter <> '' then
+            DetailedCustLedgEntry.SetFilter("Initial Entry Global Dim. 1", GlobalDim1Filter);
+        if GlobalDim2Filter <> '' then
+            DetailedCustLedgEntry.SetFilter("Initial Entry Global Dim. 2", GlobalDim2Filter);
+        if CurrencyFilter <> '' then
+            DetailedCustLedgEntry.SetFilter("Currency Code", CurrencyFilter);
+    end;
+
+    local procedure ApplyCustomerMatrixTotalsFiltersToCLE(var CustLedgEntry: Record "Cust. Ledger Entry"; DateFilter: Text; GlobalDim1Filter: Text; GlobalDim2Filter: Text; CurrencyFilter: Text)
+    begin
+        if DateFilter <> '' then
+            CustLedgEntry.SetFilter("Posting Date", DateFilter);
+        if GlobalDim1Filter <> '' then
+            CustLedgEntry.SetFilter("Global Dimension 1 Code", GlobalDim1Filter);
+        if GlobalDim2Filter <> '' then
+            CustLedgEntry.SetFilter("Global Dimension 2 Code", GlobalDim2Filter);
+        if CurrencyFilter <> '' then
+            CustLedgEntry.SetFilter("Currency Code", CurrencyFilter);
+    end;
+
+    local procedure SetCustomerMatrixColumnDimFilter(var CustLedgEntry: Record "Cust. Ledger Entry"; DimensionCode: Code[20]; DimensionValueCode: Code[20]; GeneralLedgerSetup: Record "General Ledger Setup")
+    var
+        DimensionSetEntry: Record "Dimension Set Entry";
+        DimensionSetIdFilter: Text;
+    begin
+        case DimensionCode of
+            GeneralLedgerSetup."Shortcut Dimension 3 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 3 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 4 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 4 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 5 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 5 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 6 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 6 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 7 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 7 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 8 Code":
+                CustLedgEntry.SetRange("Shortcut Dimension 8 Code", DimensionValueCode);
+            else begin
+                DimensionSetEntry.Reset();
+                DimensionSetEntry.SetRange("Dimension Code", DimensionCode);
+                DimensionSetEntry.SetRange("Dimension Value Code", DimensionValueCode);
+                if DimensionSetEntry.FindSet() then
+                    repeat
+                        DimensionSetIdFilter := AppendIntegerToFilter(DimensionSetIdFilter, DimensionSetEntry."Dimension Set ID");
+                    until DimensionSetEntry.Next() = 0
+                else
+                    DimensionSetIdFilter := '0';
+
+                CustLedgEntry.SetFilter("Dimension Set ID", DimensionSetIdFilter);
+            end;
+        end;
+    end;
+
+    local procedure IsCustomerMatrixGlobalDimension(DimensionCode: Code[20]; GlobalDimensionNo: Integer; GeneralLedgerSetup: Record "General Ledger Setup"): Boolean
+    begin
+        case GlobalDimensionNo of
+            1:
+                exit(DimensionCode = GeneralLedgerSetup."Global Dimension 1 Code");
+            2:
+                exit(DimensionCode = GeneralLedgerSetup."Global Dimension 2 Code");
+        end;
+    end;
+
+    local procedure AppendIntegerToFilter(CurrentFilter: Text; Value: Integer): Text
+    begin
+        if CurrentFilter = '' then
+            exit(Format(Value));
+
+        exit(CurrentFilter + '|' + Format(Value));
+    end;
+
+    procedure GetCustomerGLPeriodBalanceLCY(
+        CustomerNo: Code[20];
+        GLAccountFilter: Text;
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text): Decimal
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        if (CustomerNo = '') or (DimensionCode = '') or (DimensionValueCode = '') then
+            exit(0);
+
+        SetGLEntryCustomerMatrixFilters(
+            GLEntry, CustomerNo, GLAccountFilter, DimensionCode, DimensionValueCode,
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        GLEntry.CalcSums(Amount);
+        exit(GLEntry.Amount);
+    end;
+
+    procedure GetCustomerGLPeriodBalanceTotalLCY(
+        CustomerNo: Code[20];
+        GLAccountFilter: Text;
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text): Decimal
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        if CustomerNo = '' then
+            exit(0);
+
+        SetGLEntryCustomerMatrixFilters(
+            GLEntry, CustomerNo, GLAccountFilter, '', '',
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        GLEntry.CalcSums(Amount);
+        exit(GLEntry.Amount);
+    end;
+
+    procedure DrillDownCustomerGLPeriodBalance(
+        CustomerNo: Code[20];
+        GLAccountFilter: Text;
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text)
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        if CustomerNo = '' then
+            exit;
+
+        SetGLEntryCustomerMatrixFilters(
+            GLEntry, CustomerNo, GLAccountFilter, DimensionCode, DimensionValueCode,
+            DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+        PAGE.Run(PAGE::"General Ledger Entries", GLEntry);
+    end;
+
+    local procedure SetGLEntryCustomerMatrixFilters(
+        var GLEntry: Record "G/L Entry";
+        CustomerNo: Code[20];
+        GLAccountFilter: Text;
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+        DateFilter: Text;
+        GlobalDim1Filter: Text;
+        GlobalDim2Filter: Text;
+        CurrencyFilter: Text)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GLEntry.Reset();
+        GLEntry.SetRange("Source Type", GLEntry."Source Type"::Customer);
+        GLEntry.SetRange("Source No.", CustomerNo);
+        if GLAccountFilter <> '' then
+            GLEntry.SetFilter("G/L Account No.", GLAccountFilter);
+        ApplyCustomerMatrixTotalsFiltersToGLEntry(GLEntry, DateFilter, GlobalDim1Filter, GlobalDim2Filter, CurrencyFilter);
+
+        if (DimensionCode = '') or (DimensionValueCode = '') then
+            exit;
+
+        GeneralLedgerSetup.Get();
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 1, GeneralLedgerSetup) then begin
+            GLEntry.SetRange("Global Dimension 1 Code", DimensionValueCode);
+            exit;
+        end;
+
+        if IsCustomerMatrixGlobalDimension(DimensionCode, 2, GeneralLedgerSetup) then begin
+            GLEntry.SetRange("Global Dimension 2 Code", DimensionValueCode);
+            exit;
+        end;
+
+        SetGLMatrixColumnDimFilter(GLEntry, DimensionCode, DimensionValueCode, GeneralLedgerSetup);
+    end;
+
+    local procedure ApplyCustomerMatrixTotalsFiltersToGLEntry(var GLEntry: Record "G/L Entry"; DateFilter: Text; GlobalDim1Filter: Text; GlobalDim2Filter: Text; CurrencyFilter: Text)
+    begin
+        if DateFilter <> '' then
+            GLEntry.SetFilter("Posting Date", DateFilter);
+        if GlobalDim1Filter <> '' then
+            GLEntry.SetFilter("Global Dimension 1 Code", GlobalDim1Filter);
+        if GlobalDim2Filter <> '' then
+            GLEntry.SetFilter("Global Dimension 2 Code", GlobalDim2Filter);
+        if CurrencyFilter <> '' then
+            GLEntry.SetFilter("Source Currency Code", CurrencyFilter);
+    end;
+
+    local procedure SetGLMatrixColumnDimFilter(var GLEntry: Record "G/L Entry"; DimensionCode: Code[20]; DimensionValueCode: Code[20]; GeneralLedgerSetup: Record "General Ledger Setup")
+    var
+        DimensionSetEntry: Record "Dimension Set Entry";
+        DimensionSetIdFilter: Text;
+    begin
+        case DimensionCode of
+            GeneralLedgerSetup."Shortcut Dimension 3 Code":
+                GLEntry.SetRange("Shortcut Dimension 3 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 4 Code":
+                GLEntry.SetRange("Shortcut Dimension 4 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 5 Code":
+                GLEntry.SetRange("Shortcut Dimension 5 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 6 Code":
+                GLEntry.SetRange("Shortcut Dimension 6 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 7 Code":
+                GLEntry.SetRange("Shortcut Dimension 7 Code", DimensionValueCode);
+            GeneralLedgerSetup."Shortcut Dimension 8 Code":
+                GLEntry.SetRange("Shortcut Dimension 8 Code", DimensionValueCode);
+            else begin
+                DimensionSetEntry.Reset();
+                DimensionSetEntry.SetRange("Dimension Code", DimensionCode);
+                DimensionSetEntry.SetRange("Dimension Value Code", DimensionValueCode);
+                if DimensionSetEntry.FindSet() then
+                    repeat
+                        DimensionSetIdFilter := AppendIntegerToFilter(DimensionSetIdFilter, DimensionSetEntry."Dimension Set ID");
+                    until DimensionSetEntry.Next() = 0
+                else
+                    DimensionSetIdFilter := '0';
+
+                GLEntry.SetFilter("Dimension Set ID", DimensionSetIdFilter);
+            end;
+        end;
     end;
 
     var

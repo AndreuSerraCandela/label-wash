@@ -1,4 +1,4 @@
-page 50149 "Retrocesión Temporalidad"
+page 60149 "Retrocesión Temporalidad"
 {
     PageType = StandardDialog;
     Caption = 'Retroceder temporalidad';

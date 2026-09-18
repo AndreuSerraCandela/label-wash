@@ -1,4 +1,4 @@
-page 50100 "Recepción Mercancía"
+page 60100 "Recepción Mercancía"
 {
     PageType = Card;
     SourceTable = "Purchase Header";

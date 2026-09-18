@@ -1,7 +1,7 @@
 /// <summary>
 /// PageExtension RemFinChargeEntriesServ (ID 50510) extends Page Reminder/Fin. Charge Entries.
 /// </summary>
-pageextension 50148 RemFinChargeEntriesServ extends "Reminder/Fin. Charge Entries"
+pageextension 60148 RemFinChargeEntriesServ extends "Reminder/Fin. Charge Entries"
 {
     actions
     {

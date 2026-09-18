@@ -1,4 +1,4 @@
-pageextension 50102 SalesLinePriceExt extends "Price List Lines" //7001
+pageextension 60102 SalesLinePriceExt extends "Price List Lines" //7001
 {
     layout
     {

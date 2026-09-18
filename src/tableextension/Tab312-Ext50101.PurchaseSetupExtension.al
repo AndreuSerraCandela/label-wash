@@ -1,18 +1,18 @@
-tableextension 50101 "Purchase Setup Extension" extends "Purchases & Payables Setup" //312
+tableextension 60101 "Purchase Setup Extension" extends "Purchases & Payables Setup" //312
 {
     fields
     {
-        field(50100; "Proveedor Tratamientos"; Text[50])
+        field(60100; "Proveedor Tratamientos"; Text[50])
         {
             Caption = 'Proveedor Tratamientos';
             TableRelation = Vendor;
         }
-        field(50101; "Recepcion Tratamientos"; Code[20])
+        field(60101; "Recepcion Tratamientos"; Code[20])
         {
             Caption = 'Serie recepción Tratamientos';
             TableRelation = "No. Series";
         }
-        field(50102; "Recepciones Tratamientos"; Code[20])
+        field(60102; "Recepciones Tratamientos"; Code[20])
         {
             Caption = 'Serie recepcines Tratamientos';
             TableRelation = "No. Series";

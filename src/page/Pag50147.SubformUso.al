@@ -1,5 +1,5 @@
 
-page 50147 "Subform Uso"
+page 60147 "Subform Uso"
 {
     AutoSplitKey = true;
     Caption = 'Lines';

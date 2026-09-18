@@ -1,4 +1,4 @@
-table 50143 "Partner Remesa Divisa"
+table 60143 "Partner Remesa Divisa"
 {
     Caption = 'Partner Remesa Divisa';
     TableType = Temporary;

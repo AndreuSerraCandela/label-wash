@@ -1,8 +1,8 @@
-tableextension 50124 Customer extends Customer //18
+tableextension 60124 Customer extends Customer //18
 {
     fields
     {
-        field(50100; Temporal; Decimal)
+        field(60100; Temporal; Decimal)
         {
             AutoFormatType = 1;
             //   CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
@@ -17,7 +17,7 @@ tableextension 50124 Customer extends Customer //18
             FieldClass = FlowField;
 
         }
-        field(50101; "Alias remesa divisa"; Code[20])
+        field(60101; "Alias remesa divisa"; Code[20])
         {
             Caption = 'Alias remesa divisa';
             DataClassification = ToBeClassified;

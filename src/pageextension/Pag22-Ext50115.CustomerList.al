@@ -1,4 +1,4 @@
-pageextension 50115 CustomerList extends "Customer List" //22
+pageextension 60115 CustomerList extends "Customer List" //22
 {
     layout
     {
@@ -21,9 +21,53 @@ pageextension 50115 CustomerList extends "Customer List" //22
 
     actions
     {
-        // Add changes to page actions here
-    }
+        addlast(FinanceReports)
+        {
+            // action(CustomerDimBalanceMatrix)
+            // {
+            //     ApplicationArea = All;
+            //     Caption = 'Matriz saldo periodo por dimensión';
+            //     Image = ShowMatrix;
+            //     Promoted = true;
+            //     PromotedCategory = Report;
+            //     PromotedOnly = true;
+            //     ToolTip = 'Muestra el saldo periodo de los clientes desglosado por valores de dimensión.';
 
-    var
-        myInt: Integer;
+            //     trigger OnAction()
+            //     var
+            //         CustomerDimBalanceMatrix: Page "Customer Dim. Balance Matrix";
+            //     begin
+            //         CustomerDimBalanceMatrix.SetTotalsFilters(
+            //             Rec.GetFilter("Date Filter"),
+            //             Rec.GetFilter("Global Dimension 1 Filter"),
+            //             Rec.GetFilter("Global Dimension 2 Filter"),
+            //             Rec.GetFilter("Currency Filter"));
+            //         CustomerDimBalanceMatrix.Run();
+            //     end;
+            // }
+            action(CustomerGLDimBalanceMatrix)
+            {
+                ApplicationArea = All;
+                Caption = 'Matriz saldo periodo contabilidad por dimensión';
+                Image = ShowMatrix;
+                Promoted = true;
+                PromotedCategory = Report;
+                PromotedOnly = true;
+                ToolTip = 'Muestra el saldo periodo de movimientos de contabilidad por cliente (Nº origen) desglosado por valores de dimensión.';
+
+                trigger OnAction()
+                var
+                    CustomerGLDimBalanceMatrix: Page "Customer GL Balance Matrix";
+                begin
+                    CustomerGLDimBalanceMatrix.SetTotalsFilters(
+                        Rec.GetFilter("Date Filter"),
+                        Rec.GetFilter("Global Dimension 1 Filter"),
+                        Rec.GetFilter("Global Dimension 2 Filter"),
+                        Rec.GetFilter("Currency Filter"),
+                        '');
+                    CustomerGLDimBalanceMatrix.Run();
+                end;
+            }
+        }
+    }
 }

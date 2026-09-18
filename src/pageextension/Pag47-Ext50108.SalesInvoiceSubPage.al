@@ -1,4 +1,4 @@
-pageextension 50108 SalesInvoiceSubPage extends "Sales Invoice Subform" //47
+pageextension 60108 SalesInvoiceSubPage extends "Sales Invoice Subform" //47
 {
     layout
     {

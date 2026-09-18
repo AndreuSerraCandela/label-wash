@@ -1,4 +1,4 @@
-pageextension 50120 CustomerdCard extends "Customer Card" //21
+pageextension 60120 CustomerdCard extends "Customer Card" //21
 {
     layout
     {

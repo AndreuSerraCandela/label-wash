@@ -1,7 +1,7 @@
 /// <summary>
 /// Table Reminder Diagnosis Line (ID 90142).
 /// </summary>
-table 50142 "Reminder Diagnosis Line"
+table 60142 "Reminder Diagnosis Line"
 {
     Caption = 'Diagnóstico recordatorio';
     DataClassification = CustomerContent;

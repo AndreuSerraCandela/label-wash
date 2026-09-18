@@ -1,9 +1,9 @@
-tableextension 50121 "Purch. Inv. Header" extends "Purch. Inv. Header" //122
+tableextension 60121 "Purch. Inv. Header" extends "Purch. Inv. Header" //122
 {
     fields
     {
         // Add changes to table fields here
-        field(50200; "Tipo factura"; Enum "Tipo factura")
+        field(60100; "Tipo factura"; Enum "Tipo factura")
         {
             DataClassification = ToBeClassified;
         }

@@ -1,7 +1,7 @@
 /// <summary>
 /// TableExtension InformacionEmpresa (ID 90110) extends Record Company Information.
 /// </summary>
-tableextension 50110 InformacionEmpresa extends "Company Information"
+tableextension 60110 InformacionEmpresa extends "Company Information"
 {
     fields
     {

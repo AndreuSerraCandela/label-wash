@@ -1,4 +1,4 @@
-pageextension 50111 PostedSalesCreditMemo extends "Posted Sales Credit Memo" //134
+pageextension 60111 PostedSalesCreditMemo extends "Posted Sales Credit Memo" //134
 {
     layout
     {

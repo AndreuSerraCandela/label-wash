@@ -1,5 +1,5 @@
 
-page 50146 "Subform Tratamiento"
+page 60146 "Subform Tratamiento"
 {
     AutoSplitKey = true;
     Caption = 'Lines';

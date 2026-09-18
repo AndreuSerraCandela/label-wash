@@ -1,8 +1,8 @@
-tableextension 50119 SalesCrMemoHeader extends "Sales Cr.Memo Header" //114
+tableextension 60119 SalesCrMemoHeader extends "Sales Cr.Memo Header" //114
 {
     fields
     {
-        field(50050; "Albaran No."; Code[20])
+        field(60150; "Albaran No."; Code[20])
         {
             DataClassification = ToBeClassified;
         }

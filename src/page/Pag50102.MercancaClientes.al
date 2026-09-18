@@ -1,4 +1,4 @@
-page 50102 "Mercancía Clientes"
+page 60102 "Mercancía Clientes"
 {
     PageType = list;
     SourceTable = "Purchase Header";

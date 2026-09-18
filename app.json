@@ -2,7 +2,7 @@
   "id": "8f935ffe-e72d-4ab4-8556-725753c8bb2b",
   "name": "AVIACTION",
   "publisher": "MaybeCloud",
-  "version": "1.0.1.27",
+  "version": "1.0.1.33",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -10,14 +10,21 @@
   "help": "",
   "url": "",
   "logo": "",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "id": "64977288-facd-4b48-aaaa-bb0e288edfb3",
+      "name": "Payment Practices",
+      "publisher": "Microsoft",
+      "version": "23.0.0.0"
+    }
+  ],
   "screenshots": [],
   "platform": "28.0.0.0",
   "application": "28.0.0.0",
   "idRanges": [
     {
-      "from": 50100,
-      "to": 50149
+      "from": 60100,
+      "to": 60149
     }
   ],
   "resourceExposurePolicy": {

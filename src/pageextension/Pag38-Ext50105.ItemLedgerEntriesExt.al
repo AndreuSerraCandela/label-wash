@@ -1,4 +1,4 @@
-pageextension 50105 ItemLedgerEntriesExt extends "Item Ledger Entries" //38
+pageextension 60105 ItemLedgerEntriesExt extends "Item Ledger Entries" //38
 {
     layout
     {

@@ -1,4 +1,4 @@
-pageextension 50137 PaymentOrdersRemesaDivisa extends "Payment Orders"
+pageextension 60137 PaymentOrdersRemesaDivisa extends "Payment Orders"
 {
     actions
     {

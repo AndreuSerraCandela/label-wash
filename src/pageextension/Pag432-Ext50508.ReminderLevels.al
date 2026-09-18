@@ -1,7 +1,7 @@
 /// <summary>
 /// PageExtension ReminderLevelsServitec (ID 50508) extends Page Reminder Levels.
 /// </summary>
-pageextension 50128 ReminderLevelsServitec extends "Reminder Levels"
+pageextension 60128 ReminderLevelsServitec extends "Reminder Levels"
 {
     layout
     {

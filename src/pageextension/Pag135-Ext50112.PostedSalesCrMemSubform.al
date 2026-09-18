@@ -1,4 +1,4 @@
-pageextension 50112 PostedSalesCrMemSubform extends "Posted Sales Cr. Memo Subform" //135
+pageextension 60112 PostedSalesCrMemSubform extends "Posted Sales Cr. Memo Subform" //135
 {
     layout
     {
