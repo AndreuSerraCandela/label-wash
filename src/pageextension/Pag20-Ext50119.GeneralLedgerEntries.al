@@ -2,6 +2,33 @@ pageextension 60119 GeneralLedgerEntries extends "General Ledger Entries" //20
 {
     layout
     {
+        addafter("Global Dimension 2 Code")
+        {
+            field("Dimension 3 Code"; Rec."Shortcut Dimension 3 Code")
+            {
+                ApplicationArea = Dimensions;
+                CaptionClass = '1,2,3';
+                Editable = false;
+                Visible = Dim3Visible;
+                ToolTip = 'Código de la dimensión acceso directo 3 definida en la configuración contable.';
+            }
+            field("Dimension 4 Code"; Rec."Shortcut Dimension 4 Code")
+            {
+                ApplicationArea = Dimensions;
+                CaptionClass = '1,2,4';
+                Editable = false;
+                Visible = Dim4Visible;
+                ToolTip = 'Código de la dimensión acceso directo 4 definida en la configuración contable.';
+            }
+            field("Dimension 5 Code"; Rec."Shortcut Dimension 5 Code")
+            {
+                ApplicationArea = Dimensions;
+                CaptionClass = '1,2,5';
+                Editable = false;
+                Visible = Dim5Visible;
+                ToolTip = 'Código de la dimensión acceso directo 5 definida en la configuración contable.';
+            }
+        }
         addafter("Entry No.")
         {
 
@@ -66,4 +93,19 @@ pageextension 60119 GeneralLedgerEntries extends "General Ledger Entries" //20
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        Dim3Visible := GeneralLedgerSetup."Shortcut Dimension 3 Code" <> '';
+        Dim4Visible := GeneralLedgerSetup."Shortcut Dimension 4 Code" <> '';
+        Dim5Visible := GeneralLedgerSetup."Shortcut Dimension 5 Code" <> '';
+    end;
+
+    var
+        Dim3Visible: Boolean;
+        Dim4Visible: Boolean;
+        Dim5Visible: Boolean;
 }

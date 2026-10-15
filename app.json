@@ -2,7 +2,7 @@
   "id": "8f935ffe-e72d-4ab4-8556-725753c8bb2b",
   "name": "AVIACTION",
   "publisher": "MaybeCloud",
-  "version": "1.0.1.33",
+  "version": "1.0.1.34",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -15,7 +15,7 @@
       "id": "64977288-facd-4b48-aaaa-bb0e288edfb3",
       "name": "Payment Practices",
       "publisher": "Microsoft",
-      "version": "23.0.0.0"
+      "version": "28.0.0.0"
     }
   ],
   "screenshots": [],

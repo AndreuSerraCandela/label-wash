@@ -19,14 +19,35 @@ pageextension 60113 "Posted Purchase Invoices" extends "Posted Purchase Invoices
                 ApplicationArea = All;
                 ToolTip = 'Specifies the value of the Tipo factura field.', Comment = '%';
             }
+            field(HasDocumentAttachments; HasDocumentAttachments)
+            {
+                ApplicationArea = All;
+                Caption = 'Tiene adjuntos';
+                Editable = false;
+                ToolTip = 'Indica si la factura registrada tiene adjuntos (Document Attachment) en la cabecera o en las líneas.';
+            }
         }
     }
 
-    actions
-    {
-        // Add changes to page actions here
-    }
+    trigger OnAfterGetRecord()
+    begin
+        HasDocumentAttachments := InvoiceHasDocumentAttachments();
+    end;
+
+    local procedure InvoiceHasDocumentAttachments(): Boolean
+    var
+        DocumentAttachment: Record "Document Attachment";
+        DocumentAttachmentMgmt: Codeunit "Document Attachment Mgmt";
+        PurchInvHeaderRecRef: RecordRef;
+    begin
+        PurchInvHeaderRecRef.GetTable(Rec);
+        DocumentAttachment.Reset();
+        DocumentAttachmentMgmt.SetDocumentAttachmentRelatedFiltersForRecRef(DocumentAttachment, PurchInvHeaderRecRef);
+        exit(not DocumentAttachment.IsEmpty);
+    end;
+
+
 
     var
-        myInt: Integer;
+        HasDocumentAttachments: Boolean;
 }
