@@ -1289,6 +1289,58 @@ codeunit 60102 EventosVarios
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reminder-Make", 'OnAfterSet', '', false, false)]
+    local procedure ReminderMakeOnAfterSet(var Cust: Record Customer; var CustLedgEntry: Record "Cust. Ledger Entry"; var ReminderHeaderReq: Record "Reminder Header"; var OverdueEntriesOnly: Boolean; var IncludeEntriesOnHold: Boolean; var CustLedgEntryLinefeeOn: Record "Cust. Ledger Entry")
+    begin
+        OverdueEntriesOnly := false;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reminder-Make", 'OnMakeReminderOnBeforeCustLedgEntryFindSet', '', false, false)]
+    local procedure ReminderMakeOnBeforeCustLedgEntryFindSet(var CustLedgEntry: Record "Cust. Ledger Entry"; Cust: Record Customer; ReminderHeader: Record "Reminder Header"; MaxReminderLevel: Integer; var OverdueEntriesOnly: Boolean)
+    begin
+        OverdueEntriesOnly := false;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document-Mailing", 'OnBeforeGetEmailSubject', '', false, false)]
+    local procedure DocumentMailingOnBeforeGetEmailSubject(PostedDocNo: Code[20]; EmailDocumentName: Text[250]; ReportUsage: Integer; var EmailSubject: Text[250]; var IsHandled: Boolean)
+    var
+        IssuedReminderHeader: Record "Issued Reminder Header";
+    begin
+        if ReportUsage <> "Report Selection Usage"::Reminder.AsInteger() then
+            exit;
+        if not IssuedReminderHeader.Get(PostedDocNo) then
+            exit;
+
+        EmailSubject := CopyStr(IssuedReminderHeader."Customer No." + ' - Statement of account', 1, MaxStrLen(EmailSubject));
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document-Mailing", 'OnBeforeSendEmail', '', false, false)]
+    local procedure DocumentMailingOnBeforeSendEmail(var TempEmailItem: Record "Email Item" temporary; var IsFromPostedDoc: Boolean; var PostedDocNo: Code[20]; var HideDialog: Boolean; var ReportUsage: Integer; var EmailSentSuccesfully: Boolean; var IsHandled: Boolean; EmailDocName: Text[250]; SenderUserID: Code[50]; EmailScenario: Enum "Email Scenario")
+    var
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+    begin
+        if ReportUsage <> "Report Selection Usage"::Reminder.AsInteger() then
+            exit;
+
+        SalesReceivablesSetup.Get();
+        if SalesReceivablesSetup."Reminder CC E-Mail" <> '' then
+            TempEmailItem."Send CC" :=
+                CopyStr(
+                    AppendEmailAddress(TempEmailItem."Send CC", SalesReceivablesSetup."Reminder CC E-Mail"),
+                    1,
+                    MaxStrLen(TempEmailItem."Send CC"));
+
+        TempEmailItem.SetBodyText('');
+    end;
+
+    local procedure AppendEmailAddress(CurrentAddresses: Text; NewAddress: Text): Text
+    begin
+        if CurrentAddresses = '' then
+            exit(NewAddress);
+        exit(CurrentAddresses + ';' + NewAddress);
+    end;
+
     var
         SinDocumentosErr: Label 'No hay documentos de cartera asociados al número %1.';
         SinCuentaBancariaErr: Label 'No se ha encontrado cuenta bancaria para la cuenta %1.';
