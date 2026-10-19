@@ -9,4 +9,12 @@ reportextension 60132 ReminderAviactionExt extends Reminder
             }
         }
     }
+
+    trigger OnPreReport()
+    begin
+        // El diseño estándar omite el bloque "Movimientos pendientes no vencidos"
+        // salvo que la opción de la request page esté marcada. El recordatorio ya
+        // contiene esas líneas; aquí se fuerzan siempre en la impresión y en el correo.
+        ShowNotDueAmounts := true;
+    end;
 }
