@@ -1331,7 +1331,7 @@ codeunit 60102 EventosVarios
                     1,
                     MaxStrLen(TempEmailItem."Send CC"));
 
-        TempEmailItem.SetBodyText('');
+        //TempEmailItem.SetBodyText('');
     end;
 
     local procedure AppendEmailAddress(CurrentAddresses: Text; NewAddress: Text): Text
