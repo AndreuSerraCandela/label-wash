@@ -28,6 +28,12 @@ tableextension 60100 PurchaseHeaderExtension extends "Purchase Header" //38
         }
 
         field(60100; Recepcion; Enum Recepcion) { }
+        field(60130; "Fecha de operación"; Date)
+        {
+            Caption = 'Fecha de operación';
+            DataClassification = CustomerContent;
+            ToolTip = 'Especifica la fecha de operación de la factura.';
+        }
         field(60104; "Bill-to Customer No."; Code[20])
         {
             Caption = 'Cód Cliente';

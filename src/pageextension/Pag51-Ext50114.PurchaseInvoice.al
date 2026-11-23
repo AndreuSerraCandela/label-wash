@@ -2,6 +2,14 @@ pageextension 60114 PurchaseInvoice extends "Purchase Invoice" //51
 {
     layout
     {
+        addafter("Posting Date")
+        {
+            field("Fecha de operación"; Rec."Fecha de operación")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Especifica la fecha de operación de la factura.';
+            }
+        }
         addafter(Status)
         {
             field("Tipo factura"; Rec."Tipo factura")

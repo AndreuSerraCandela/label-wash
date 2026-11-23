@@ -57,5 +57,13 @@ pageextension 60127 GeneralLedgerSetupPageExt extends "General Ledger Setup"
                 }
             }
         }
+        addlast(Content)
+        {
+            part(MovContabDimensiones; "Mov. contab. dimensiones")
+            {
+                ApplicationArea = All;
+                Caption = 'Dimensiones en movimientos de contabilidad';
+            }
+        }
     }
 }

@@ -7,6 +7,12 @@ tableextension 60121 "Purch. Inv. Header" extends "Purch. Inv. Header" //122
         {
             DataClassification = ToBeClassified;
         }
+        field(60130; "Fecha de operación"; Date)
+        {
+            Caption = 'Fecha de operación';
+            DataClassification = CustomerContent;
+            ToolTip = 'Especifica la fecha de operación de la factura.';
+        }
     }
 
     keys

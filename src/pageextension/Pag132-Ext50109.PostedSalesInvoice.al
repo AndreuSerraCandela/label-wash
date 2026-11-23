@@ -4,7 +4,11 @@ pageextension 60109 PostedSalesInvoice extends "Posted Sales Invoice" //132
     {
         addafter("Posting Date")
         {
-
+            field("Fecha de operación"; Rec."Fecha de operación")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Especifica la fecha de operación de la factura.';
+            }
             field("Albaran No."; Rec."Albaran No.")
             {
                 ApplicationArea = All;

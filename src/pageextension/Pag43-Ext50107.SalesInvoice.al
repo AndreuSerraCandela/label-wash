@@ -2,6 +2,14 @@ pageextension 60107 SalesInvoice extends "Sales Invoice" //43
 {
     layout
     {
+        addafter("Posting Date")
+        {
+            field("Fecha de operación"; Rec."Fecha de operación")
+            {
+                ApplicationArea = All;
+                ToolTip = 'Especifica la fecha de operación de la factura.';
+            }
+        }
         addafter("Your Reference")
         {
 

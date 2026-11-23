@@ -10,6 +10,12 @@ tableextension 60117 SalesHeaderExt extends "Sales Header" //36
         {
             DataClassification = ToBeClassified;
         }
+        field(60130; "Fecha de operación"; Date)
+        {
+            Caption = 'Fecha de operación';
+            DataClassification = CustomerContent;
+            ToolTip = 'Especifica la fecha de operación de la factura.';
+        }
         //linea
 
     }
