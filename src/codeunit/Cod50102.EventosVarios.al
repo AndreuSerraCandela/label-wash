@@ -1341,6 +1341,47 @@ codeunit 60102 EventosVarios
         exit(CurrentAddresses + ';' + NewAddress);
     end;
 
+    // [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Posting Date', false, false)]
+    // local procedure SalesHeaderOnAfterValidatePostingDate(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer)
+    // begin
+    //     ActualizarFechaEnvioDesdeRegistro(Rec, false);
+    // end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnAfterCopySalesDocument', '', false, false)]
+    local procedure CopyDocumentMgtOnAfterCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20]; var ToSalesHeader: Record "Sales Header"; FromDocOccurenceNo: Integer; FromDocVersionNo: Integer; IncludeHeader: Boolean; RecalculateLines: Boolean; MoveNegLines: Boolean)
+    begin
+        ActualizarFechaEnvioDesdeRegistro(ToSalesHeader, true);
+    end;
+
+    local procedure ActualizarFechaEnvioDesdeRegistro(var SalesHeader: Record "Sales Header"; GuardarCabecera: Boolean)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        if SalesHeader.IsTemporary() then
+            exit;
+        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"]) then
+            exit;
+        if SalesHeader."Posting Date" = 0D then
+            exit;
+
+        if SalesHeader."Shipment Date" <> SalesHeader."Posting Date" then begin
+            SalesHeader."Shipment Date" := SalesHeader."Posting Date";
+            if GuardarCabecera then
+                SalesHeader.Modify(false);
+        end;
+
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter("Shipment Date", '<>%1', SalesHeader."Posting Date");
+        if SalesLine.IsEmpty() then
+            exit;
+        SalesLine.FindSet(true);
+        repeat
+            SalesLine."Shipment Date" := SalesHeader."Posting Date";
+            SalesLine.Modify(false);
+        until SalesLine.Next() = 0;
+    end;
+
     var
         SinDocumentosErr: Label 'No hay documentos de cartera asociados al número %1.';
         SinCuentaBancariaErr: Label 'No se ha encontrado cuenta bancaria para la cuenta %1.';
